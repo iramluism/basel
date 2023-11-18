@@ -145,6 +145,8 @@ dmypy.json
 
 .vscode 
 
+poetry.lock
+
 # Pyre type checker
 .pyre/
 
