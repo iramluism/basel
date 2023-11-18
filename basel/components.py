@@ -3,7 +3,7 @@ import os
 
 from pathlib import Path
 
-from typing import Optional, NoReturn, List
+from typing import Optional, NoReturn, List, Union
 from dataclasses import dataclass
 
 
@@ -29,29 +29,64 @@ class Component(metaclass=abc.ABCMeta):
             self.abstract_classes += 1 
         else:
             self.no_abstract_classes += 1
+    
+    @abc.abstractmethod    
+    def calculate_abstraction(self):
+        raise NotImplementedError()
+    
+    @abc.abstractmethod
+    def calculate_stability(self):
+        raise NotImplementedError()
 
 
 class ComponentLoader(metaclass=abc.ABCMeta):
     
     @abc.abstractmethod
-    def load_component(self, *args, **kwargs) -> Component:
+    def load_components(self, *args, **kwargs) -> Component:
         raise NotImplementedError()
+    
 
-
-@dataclass
 class ModuleComponent(Component):
-    module_name: Optional[str] = None
-    path: Optional[str] = None 
-
-
+    name: Optional[str] = None
+    path: Optional[Path] = None 
+    
+    def __init__(self, path: Path, name: Optional[str]=None):
+        if not name:
+            name = self._get_name_from_path(path)
+        
+        self.path = path 
+        self.name = name
+        
+    @staticmethod
+    def _get_name_from_path(path: Path):
+        if "__init__.py" == path.name:
+            package = os.path.dirname(path)
+            return os.path.split(package)[-1]
+            
+        else:
+            return path.stem 
+        
+    
+    def calculate_abstraction(self):
+        pass 
+    
+    def calculate_stability(self):
+        pass 
+    
 class ModuleComponentLoader(ComponentLoader):
     
-    components = []
+    def __init__(self, root_path=None):
+        self.root_path = root_path
+        self.components = {}
     
-    def load_component(self, root_path: str) -> ModuleComponent:
+    def load_components(self, root_path: str) -> NoReturn:
+
+        if root_path in self.components:
+            return None
         
-        self.get_py_modules(root_path)
-        
+        for module in self.get_py_modules(root_path):
+            component = ModuleComponent(path=module) 
+            self.components[str(module)] = component
     
     def _find_py_modules(self, root, modules) -> List[Path]:
         py_modules = []
@@ -75,3 +110,6 @@ class ModuleComponentLoader(ComponentLoader):
             py_modules.extend(self._find_py_modules(root, modules))
 
         return py_modules
+    
+    def get_components(self) -> List[ModuleComponent]:
+        return list(self.components.values())
