@@ -52,3 +52,16 @@ def test_load_components(root_module: Path, expected_components: List[ModuleComp
     loader.load_components(root_module)
 
     assert loader.get_components() == expected_components
+
+
+@pytest.mark.parametrize(
+    "component,expected_abstraction",
+    [
+        (ModuleComponent(path=root_stub_project / Path("package_a/module_a1.py"), name="module_a1"), 1),
+        (ModuleComponent(path=root_stub_project / Path("package_a/module_a2.py"), name="module_a2"), 0.5),
+    ]
+)
+def tests_calculate_abstraction(component: ModuleComponent, expected_abstraction: float):
+    abstraction = component.get_abstraction()
+    assert abstraction == expected_abstraction
+    

@@ -1,41 +1,68 @@
 import abc 
 import os 
+import inspect
+import importlib
 
 from pathlib import Path
 
 from typing import Optional, NoReturn, List, Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class Component(metaclass=abc.ABCMeta):
-    abstraction: Optional[float] = None
-    inestability: Optional[float] = None 
+
+    def __init__(
+        self, 
+        abstraction: Optional[float] = None,
+        instability: Optional[float] = None,
+        external_dependencies: Optional[float] = None,
+        internal_dependencies: Optional[float] = None,
+        no_abstract_classes: Optional[float] = None,
+        abstract_classes: Optional[float] = None
+    ):
+        self.abstraction = abstraction
+        self.instability = instability
     
-    external_dependencies: float = 0.0 
-    internal_dependencies: float = 0.0 
+        self.external_dependencies = external_dependencies or []
+        self.internal_dependencies = internal_dependencies or []
+        
+        self.no_abstract_classes = no_abstract_classes or []
+        self.abstract_classes = abstract_classes or []
     
-    no_abstract_classes: float = 0.0 
-    abstract_classes: float = 0.0 
-    
-    def add_dependency(self, is_internal=False) -> NoReturn:
+    def add_dependency(self, component, is_internal=False) -> NoReturn:
         if is_internal:
-            self.internal_dependencies += 1 
+            self.internal_dependencies.append(component)
         else: 
-            self.external_dependencies += 1
+            self.external_dependencies.append(component)
     
-    def add_class(self, is_abstract=True) -> NoReturn: 
+    def add_class(self, _class, is_abstract=True) -> NoReturn: 
         if is_abstract:
-            self.abstract_classes += 1 
+            self.abstract_classes.append(_class)
         else:
-            self.no_abstract_classes += 1
+            self.no_abstract_classes.append(_class)
     
     @abc.abstractmethod    
-    def calculate_abstraction(self):
+    def get_abstraction(self):
         raise NotImplementedError()
     
     @abc.abstractmethod
-    def calculate_stability(self):
+    def get_instability(self):
+        raise NotImplementedError()
+ 
+    def calculate_abstraction(self):
+        
+        abstraction = 1
+        n_abstract_classess = len(self.abstract_classes)
+        n_classes = len(self.abstract_classes) + len(self.no_abstract_classes)
+        
+        if n_classes:
+            abstraction = n_abstract_classess / n_classes
+    
+        self.abstraction = abstraction
+        return abstraction
+        
+    def calculate_instability(self):
         raise NotImplementedError()
 
 
@@ -50,12 +77,17 @@ class ModuleComponent(Component):
     name: Optional[str] = None
     path: Optional[Path] = None 
     
-    def __init__(self, path: Path, name: Optional[str]=None):
+    def __init__(self, path: Path, name: Optional[str]=None, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
         if not name:
             name = self._get_name_from_path(path)
         
         self.path = path 
         self.name = name
+        
+    @staticmethod
+    def _is_abstract_class(_class):
+        return inspect.isabstract(_class)
         
     @staticmethod
     def _get_name_from_path(path: Path):
@@ -65,12 +97,31 @@ class ModuleComponent(Component):
             
         else:
             return path.stem 
+    
+    def get_abstraction(self):
         
+        for module_class in self._get_classes():
+            self.add_class(
+                _class=module_class, 
+                is_abstract=self._is_abstract_class(module_class),
+            )
+
+        self.calculate_abstraction()
+        return self.abstraction 
     
-    def calculate_abstraction(self):
-        pass 
+    def _get_classes(self):
+        classes = []
+        package_path = str(self.path.parent).replace("/", ".")
+        module_path = f"{package_path}.{self.name}"
+        
+        module = importlib.import_module(module_path)
+        for module_name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj):
+                classes.append(obj)
+
+        return classes
     
-    def calculate_stability(self):
+    def get_instability(self):
         pass 
     
 class ModuleComponentLoader(ComponentLoader):
