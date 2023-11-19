@@ -8,25 +8,25 @@ IGONORE_DEPENDENCIES = ["abc"]
 STAB_PROJECT_PATH = Path("tests/stubs/stub_project")
 STAB_PROJECT_MAIN_DISTANCE = 0.5
 STAB_PROJECT_AS_PLANE = {
-    "tests.stubs.stub_project": (1, 1),
-    "tests.stubs.stub_project.module_1": (1, 0),
-    "tests.stubs.stub_project.package_a.module_a2": (0, 0.5),
-    "tests.stubs.stub_project.package_a.module_a1": (0, 1.0),
-    "tests.stubs.stub_project.package_a": (1, 1),
+    "tests.stubs.stub_project": (1, 1, 1),
+    "tests.stubs.stub_project.module_1": (1, 0, 0),
+    "tests.stubs.stub_project.package_a.module_a2": (0, 0.5, 0.5),
+    "tests.stubs.stub_project.package_a.module_a1": (0, 1.0, 0.0),
+    "tests.stubs.stub_project.package_a": (1, 1, 1),
 }
 
 STAB_PROJECT_A_PATH = Path("tests/stubs/stub_project_a")
-STAB_PROJECT_A_MAIN_DISTANCE = 0.5926
+STAB_PROJECT_A_MAIN_DISTANCE = 0.59
 STAB_PROJECT_A_AS_PLANE = {
-    "tests.stubs.stub_project_a": (1, 1),
-    "tests.stubs.stub_project_a.module_1": (1, 0),
-    "tests.stubs.stub_project_a.package_a.module_a2": (0, 0.5),
-    "tests.stubs.stub_project_a.package_a.module_a1": (1 / 3, 1.0),
-    "tests.stubs.stub_project_a.package_b": (1, 1),
-    "tests.stubs.stub_project_a.package_b.module_b1": (0.5, 0),
-    "tests.stubs.stub_project_a.package_b.module_b2": (1, 0),
-    "tests.stubs.stub_project_a.package_b.module_b3": (1, 1),
-    "tests.stubs.stub_project_a.package_a": (1, 1),
+    "tests.stubs.stub_project_a": (1, 1, 1),
+    "tests.stubs.stub_project_a.module_1": (1, 0, 0),
+    "tests.stubs.stub_project_a.package_a.module_a2": (0, 0.5, 0.5),
+    "tests.stubs.stub_project_a.package_a.module_a1": (0.33, 1.0, 0.33),
+    "tests.stubs.stub_project_a.package_b": (1, 1, 1),
+    "tests.stubs.stub_project_a.package_b.module_b1": (0.5, 0, 0.5),
+    "tests.stubs.stub_project_a.package_b.module_b2": (1, 0, 0),
+    "tests.stubs.stub_project_a.package_b.module_b3": (1, 1, 1),
+    "tests.stubs.stub_project_a.package_a": (1, 1, 1),
 }
 
 
@@ -61,6 +61,6 @@ def tests_calculate_main_distance(root_path: Path, expected_main_distance: float
         root_path=root_path, ignore_dependencies=IGONORE_DEPENDENCIES
     )
     loader.load_components()
-    as_plane = loader.calculate_main_distance()
+    main_distance = loader.calculate_main_distance()
 
-    assert as_plane == expected_main_distance
+    assert main_distance == expected_main_distance

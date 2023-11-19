@@ -60,7 +60,7 @@ class Component(metaclass=abc.ABCMeta):
         abstraction = self.get_abstraction()
         instability = self.get_instability()
 
-        distance = abs(abstraction + instability - 1)
+        distance = round(abs(abstraction + instability - 1), 2)
 
         self.distance = distance
 
@@ -72,7 +72,7 @@ class Component(metaclass=abc.ABCMeta):
         n_classes = len(self.abstract_classes) + len(self.no_abstract_classes)
 
         if n_classes:
-            abstraction = n_abstract_classess / n_classes
+            abstraction = round(n_abstract_classess / n_classes, 2)
 
         self.abstraction = abstraction
         return abstraction
@@ -83,7 +83,7 @@ class Component(metaclass=abc.ABCMeta):
         n_deps = n_external_deps + len(self.internal_dependencies)
 
         if n_deps:
-            instability = n_external_deps / n_deps
+            instability = round(n_external_deps / n_deps, 2)
 
         self.instability = instability
         return instability

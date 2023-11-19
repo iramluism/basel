@@ -189,13 +189,14 @@ class ModuleComponentLoader(ComponentLoader):
         for component_name, component in self.components.items():
             instability = component.get_instability()
             abstraction = component.get_abstraction()
-            as_point = ASPoint(x=instability, y=abstraction)
+            distance = component.get_distance()
+            as_point = ASPoint(x=instability, y=abstraction, d=distance)
 
             as_plane[component_name] = as_point
 
         return as_plane
 
-    def calculate_main_distance(self, decimals: int = 4):
+    def calculate_main_distance(self, decimals: int = 2):
         main_distance = 0
         distances = []
 
