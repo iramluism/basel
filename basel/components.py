@@ -178,7 +178,19 @@ class ModuleComponent(Component):
                 for alias in node.names:
                     _imports.add(alias.name)
             elif isinstance(node, ast.ImportFrom):
-                _imports.add(node.module)
+                modules = set()
+
+                for alias in node.names:
+                    try:
+                        module_path = f"{node.module}.{alias.name}"
+                        importlib.import_module(module_path)
+                        modules.add(module_path)
+                    except ImportError:
+                        pass
+
+                _imports = _imports | modules
+                if len(modules) != len(node.names):
+                    _imports.add(node.module)
 
         return _imports
 
