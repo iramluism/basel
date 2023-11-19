@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 
 ASPoint = namedtuple("ASPoint", ["x", "y", "d"])
 
@@ -11,3 +12,4 @@ ASPoint = namedtuple("ASPoint", ["x", "y", "d"])
 class Report:
     columns: List[str]
     data: Dict[str, Any]
+    footer: Optional[str] = None

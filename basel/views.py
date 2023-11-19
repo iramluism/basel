@@ -12,4 +12,6 @@ class View(metaclass=abc.ABCMeta):
 
 class ConsoleView(View):
     def render_report(self, report: Report):
-        tabulate(report.data, headers=report.columns)
+        print(tabulate(report.data, headers=report.columns))
+        if report.footer:
+            print(report.footer)

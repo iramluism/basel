@@ -36,9 +36,11 @@ class Basel:
         self.loader.load_components(root_path)
 
         as_plane = self.loader.get_as_plane()
+        mean_distance = self.loader.calculate_main_distance()
         report = Report(
             columns=["Component", "A", "E", "D"],
             data=self._format_report_data(as_plane),
+            footer=f"Mean Distance: {mean_distance}",
         )
 
         self.view.render_report(report)
