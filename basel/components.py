@@ -137,15 +137,13 @@ class ModuleComponent(Component):
 
 
 class ModuleComponentLoader(ComponentLoader):
-    def __init__(
-        self,
-        root_path=None,
-        components: Optional[Dict[str, ModuleComponent]] = None,
-        ignore_dependencies: Optional[List[str]] = None,
-    ):
+    def __init__(self, root_path=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.root_path = root_path
-        self.components = components or {}
-        self.ignore_dependencies = ignore_dependencies
+        self._ignore_native_library()
+
+    def _ignore_native_library(self):
+        self.ignore_deps(["abc", "typing"])
 
     def load_components(self, root_path: Optional[Path] = None) -> NoReturn:
         if not root_path:

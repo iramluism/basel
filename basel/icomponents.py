@@ -90,6 +90,17 @@ class Component(metaclass=abc.ABCMeta):
 
 
 class ComponentLoader(metaclass=abc.ABCMeta):
+    def __init__(
+        self,
+        components: Optional[Dict[str, Component]] = None,
+        ignore_dependencies: Optional[str] = None,
+    ):
+        self.ignore_dependencies = ignore_dependencies or []
+        self.components = components or {}
+
+    def ignore_deps(self, dependencies):
+        self.ignore_dependencies.extend(dependencies)
+
     @abc.abstractmethod
     def load_components(self, *args, **kwargs) -> Component:
         raise NotImplementedError()

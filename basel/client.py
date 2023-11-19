@@ -21,7 +21,7 @@ class Basel:
 
         self.ignore_dependencies = ignore_depencies
         self.loader = loader
-        self.loader.ignore_dependencies = self.ignore_dependencies
+        self.loader.ignore_deps(self.ignore_dependencies)
         self.view = view
 
     def _format_report_data(self, data: Dict[str, ASPoint]) -> List[Any]:
