@@ -1,6 +1,7 @@
 from typing import Any
 from typing import Dict
 from typing import List
+from pathlib import Path
 from typing import Optional
 
 from src.components import ComponentLoader
@@ -32,8 +33,8 @@ class Basel:
 
         return formatted_data
 
-    def report(self, root_path):
-        self.loader.load_components(root_path)
+    def report(self, root_path: Path, ignore_dependencies: Optional[List[str]] = None):
+        self.loader.load_components(root_path, ignore_dependencies)
 
         as_plane = self.loader.get_as_plane()
         mean_distance = self.loader.calculate_main_distance()
