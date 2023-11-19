@@ -2,11 +2,12 @@
 name = "basel"
 version = "0.1.0"
 description = ""
-authors = ["Iram Luis Morales Santos <iramluism@gmail.com>"]
+authors = ["Iram Luis Morales Santos <iramluism@gmail.com>", "Maura Elena Diaz Boente <mdboente@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+tabulate = "^0.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
