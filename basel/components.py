@@ -144,24 +144,28 @@ class ModuleComponent(Component):
             return f"{parent_name}.{path.stem}"
 
     def get_abstraction(self):
-        for module_class in self._get_classes():
-            self.add_class(
-                _class=module_class,
-                is_abstract=self._is_abstract_class(module_class),
-            )
-
+        self.load_classes()
         self.calculate_abstraction()
         return self.abstraction
 
-    def _get_classes(self):
-        classes = []
+    def depend_of(self, component_name: str):
+        for component in self.external_dependencies:
+            if component.name == component_name:
+                return True
+
+        return False
+
+    def load_classes(self):
+        if self.no_abstract_classes or self.abstract_classes:
+            return None
 
         module = importlib.import_module(self.name)
         for module_name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj):
-                classes.append(obj)
-
-        return classes
+            if inspect.isclass(obj) and not self.depend_of(obj.__module__):
+                self.add_class(
+                    _class=obj,
+                    is_abstract=self._is_abstract_class(obj),
+                )
 
     def get_dependencies(self):
         with open(self.path, "r") as archivo:
@@ -192,7 +196,6 @@ class ModuleComponent(Component):
             self.add_dependency(dep_comp)
 
     def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
-        self.load_dependencies(ignore_dependencies=ignore_dependencies)
         self.calculate_instability()
         return self.instability
 
@@ -214,17 +217,24 @@ class ModuleComponentLoader(ComponentLoader):
 
         self._load_components(root_path)
         self._load_dependencies()
+        self._load_classes()
 
     def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
             component = ModuleComponent(path=module)
             self.components[component.name] = component
 
+    def _load_classes(self):
+        for component in self.components.values():
+            component.load_classes()
+
     def _load_dependencies(self):
         for component_name, component in self.components.items():
             component.load_dependencies(ignore_dependencies=self.ignore_dependencies)
-            for comp_deps in component.external_dependencies:
-                if comp_deps.name in self.components:
+            self.components[component_name] = component
+            for comp_ext_deps in component.external_dependencies:
+                if comp_ext_deps.name in self.components:
+                    comp_deps = self.components.get(comp_ext_deps.name)
                     comp_deps.add_dependency(component, is_internal=True)
 
     def _find_py_modules(self, root, modules) -> List[Path]:
