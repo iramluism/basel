@@ -195,7 +195,7 @@ class ModuleComponentLoader(ComponentLoader):
 
         return as_plane
 
-    def calculate_main_distance(self):
+    def calculate_main_distance(self, decimals: int = 4):
         main_distance = 0
         distances = []
 
@@ -206,7 +206,7 @@ class ModuleComponentLoader(ComponentLoader):
         if distances:
             main_distance = sum(distances) / len(distances)
 
-        return main_distance
+        return round(main_distance, decimals)
 
     def get_py_modules(self, root_path: str):
         py_modules = []

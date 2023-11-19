@@ -6,7 +6,7 @@ import pytest
 IGONORE_DEPENDENCIES = ["abc"]
 
 STAB_PROJECT_PATH = Path("tests/stubs/stub_project")
-STAB_PROJECT_MAIN_DISTANCE = 0.0
+STAB_PROJECT_MAIN_DISTANCE = 0.5
 STAB_PROJECT_AS_PLANE = {
     "tests.stubs.stub_project": (1, 1),
     "tests.stubs.stub_project.module_1": (1, 0),
@@ -16,7 +16,7 @@ STAB_PROJECT_AS_PLANE = {
 }
 
 STAB_PROJECT_A_PATH = Path("tests/stubs/stub_project_a")
-STAB_PROJECT_A_MAIN_DISTANCE = 0.0
+STAB_PROJECT_A_MAIN_DISTANCE = 0.5926
 STAB_PROJECT_A_AS_PLANE = {
     "tests.stubs.stub_project_a": (1, 1),
     "tests.stubs.stub_project_a.module_1": (1, 0),

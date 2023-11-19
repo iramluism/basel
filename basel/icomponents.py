@@ -53,11 +53,12 @@ class Component(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     def get_distance(self) -> float:
+        self.calculate_distance()
         return self.distance
 
     def calculate_distance(self):
-        abstraction = self.abstraction
-        instability = self.instability
+        abstraction = self.get_abstraction()
+        instability = self.get_instability()
 
         distance = abs(abstraction + instability - 1)
 
