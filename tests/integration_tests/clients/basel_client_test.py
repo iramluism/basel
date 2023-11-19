@@ -9,7 +9,7 @@ from src.dtos import Report
 from src.views import View
 
 IGNORE_DEPENDENCIES = ["abc"]
-REPORT_COLUMNS = ["Component", "A", "E", "D"]
+REPORT_COLUMNS = ["Component", "I", "A", "D"]
 STUB_PROJECT_A_PATH = Path("tests/stubs/stub_project_a")
 STUB_PROJECT_A_REPORT_DATA = [
     ("tests.stubs.stub_project_a", 1, 1, 1),
