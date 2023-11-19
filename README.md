@@ -1,8 +1,7 @@
 
 ## Basel Library
 
-### Installation for development using Docker and Docker-compose
-
+This library is to calculate the abstraction and the stability of a project
 
 #### Clone repository
 
