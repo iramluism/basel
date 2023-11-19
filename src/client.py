@@ -3,10 +3,10 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from basel.components import ComponentLoader
-from basel.dtos import ASPoint
-from basel.dtos import Report
-from basel.views import View
+from src.components import ComponentLoader
+from src.dtos import ASPoint
+from src.dtos import Report
+from src.views import View
 
 
 class Basel:

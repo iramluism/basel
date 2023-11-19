@@ -8,9 +8,9 @@ from typing import List
 from typing import NoReturn
 from typing import Optional
 
-from basel.dtos import ASPoint
-from basel.icomponents import Component
-from basel.icomponents import ComponentLoader
+from src.dtos import ASPoint
+from src.icomponents import Component
+from src.icomponents import ComponentLoader
 
 
 class ModuleComponent(Component):
