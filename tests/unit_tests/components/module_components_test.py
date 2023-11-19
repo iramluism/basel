@@ -37,19 +37,24 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
             root_stub_project,
             [
                 ModuleComponent(
-                    path=root_stub_project / Path("__init__.py"), name="stub_project"
+                    path=root_stub_project / Path("__init__.py"),
+                    name="tests.stubs.stub_project",
                 ),
                 ModuleComponent(
-                    path=root_stub_project / Path("module_1.py"), name="module_1"
+                    path=root_stub_project / Path("module_1.py"),
+                    name="tests.stubs.stub_project.module_1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a2.py"),
+                    name="tests.stubs.stub_project.package_a.module_a2",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
+                    name="tests.stubs.stub_project.package_a.module_a1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/__init__.py"),
+                    name="tests.stubs.stub_project.package_a",
                 ),
             ],
         ),
@@ -59,7 +64,10 @@ def test_load_components(root_module: Path, expected_components: List[ModuleComp
     loader = ModuleComponentLoader()
     loader.load_components(root_module)
 
-    assert loader.get_components() == expected_components
+    components = loader.get_components()
+    for component, expected_component in zip(components, expected_components):
+        assert component.path == expected_component.path
+        assert component.name == expected_component.name
 
 
 @pytest.mark.parametrize(

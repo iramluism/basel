@@ -1,7 +1,4 @@
-import abc
 import ast
-from collections import namedtuple
-from dataclasses import dataclass
 import importlib
 import inspect
 import os
@@ -11,95 +8,9 @@ from typing import List
 from typing import NoReturn
 from typing import Optional
 
-ASPoint = namedtuple("ASPoint", ["x", "y"])
-
-
-@dataclass
-class Component(metaclass=abc.ABCMeta):
-    def __init__(
-        self,
-        abstraction: Optional[float] = None,
-        instability: Optional[float] = None,
-        distance: Optional[float] = None,
-        external_dependencies: Optional[float] = None,
-        internal_dependencies: Optional[float] = None,
-        no_abstract_classes: Optional[float] = None,
-        abstract_classes: Optional[float] = None,
-    ):
-        self.abstraction = abstraction or 1
-        self.instability = instability or 1
-        self.distance = distance or 0
-
-        self.external_dependencies = external_dependencies or []
-        self.internal_dependencies = internal_dependencies or []
-
-        self.no_abstract_classes = no_abstract_classes or []
-        self.abstract_classes = abstract_classes or []
-
-    def add_dependency(self, component, is_internal=False) -> NoReturn:
-        if is_internal:
-            self.internal_dependencies.append(component)
-        else:
-            self.external_dependencies.append(component)
-
-    def add_class(self, _class, is_abstract=True) -> NoReturn:
-        if is_abstract:
-            self.abstract_classes.append(_class)
-        else:
-            self.no_abstract_classes.append(_class)
-
-    @abc.abstractmethod
-    def get_dependencies(self):
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_abstraction(self):
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
-        raise NotImplementedError()
-
-    def get_distance(self) -> float:
-        return self.distance
-
-    def calculate_distance(self):
-        abstraction = self.abstraction
-        instability = self.instability
-
-        distance = abs(abstraction + instability - 1)
-
-        self.distance = distance
-
-        return self.distance
-
-    def calculate_abstraction(self):
-        abstraction = 1
-        n_abstract_classess = len(self.abstract_classes)
-        n_classes = len(self.abstract_classes) + len(self.no_abstract_classes)
-
-        if n_classes:
-            abstraction = n_abstract_classess / n_classes
-
-        self.abstraction = abstraction
-        return abstraction
-
-    def calculate_instability(self):
-        instability = 1
-        n_external_deps = len(self.external_dependencies)
-        n_deps = n_external_deps + len(self.internal_dependencies)
-
-        if n_deps:
-            instability = n_external_deps / n_deps
-
-        self.instability = instability
-        return instability
-
-
-class ComponentLoader(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def load_components(self, *args, **kwargs) -> Component:
-        raise NotImplementedError()
+from basel.dtos import ASPoint
+from basel.icomponents import Component
+from basel.icomponents import ComponentLoader
 
 
 class ModuleComponent(Component):
@@ -167,30 +78,43 @@ class ModuleComponent(Component):
                     is_abstract=self._is_abstract_class(obj),
                 )
 
+    @staticmethod
+    def _import_module(module_path):
+        try:
+            module = importlib.import_module(module_path)
+            return module
+        except ImportError:
+            pass
+
+    def _eval_dependency(self, dep) -> set:
+        _imports = set()
+
+        if isinstance(dep, ast.Import):
+            for alias in dep.names:
+                _imports.add(alias.name)
+        elif isinstance(dep, ast.ImportFrom):
+            modules = set()
+
+            for alias in dep.names:
+                module_path = f"{dep.module}.{alias.name}"
+                module = self._import_module(module_path)
+                if module:
+                    modules.add(module_path)
+
+            _imports = _imports | modules
+            if len(modules) != len(dep.names):
+                _imports.add(dep.module)
+
+        return _imports
+
     def get_dependencies(self):
         with open(self.path, "r") as archivo:
             tree_imports = ast.parse(archivo.read())
 
         _imports = set()
-
         for node in ast.walk(tree_imports):
-            if isinstance(node, ast.Import):
-                for alias in node.names:
-                    _imports.add(alias.name)
-            elif isinstance(node, ast.ImportFrom):
-                modules = set()
-
-                for alias in node.names:
-                    try:
-                        module_path = f"{node.module}.{alias.name}"
-                        importlib.import_module(module_path)
-                        modules.add(module_path)
-                    except ImportError:
-                        pass
-
-                _imports = _imports | modules
-                if len(modules) != len(node.names):
-                    _imports.add(node.module)
+            deps = self._eval_dependency(node)
+            _imports = _imports | deps
 
         return _imports
 

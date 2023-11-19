@@ -1,7 +1,10 @@
 import abc
+from typing import Dict
 from typing import List
 from typing import NoReturn
 from typing import Optional
+
+from basel.dtos import ASPoint
 
 
 class Component(metaclass=abc.ABCMeta):
@@ -83,3 +86,17 @@ class Component(metaclass=abc.ABCMeta):
 
         self.instability = instability
         return instability
+
+
+class ComponentLoader(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def load_components(self, *args, **kwargs) -> Component:
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_as_plane(self) -> Dict[str, ASPoint]:
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def calculate_main_distance(self) -> float:
+        raise NotImplementedError()
