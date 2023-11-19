@@ -1,4 +1,5 @@
 import abc
+import ast
 from dataclasses import dataclass
 import importlib
 import inspect
@@ -46,7 +47,7 @@ class Component(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_instability(self):
+    def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
         raise NotImplementedError()
 
     def calculate_abstraction(self):
@@ -82,10 +83,15 @@ class ModuleComponent(Component):
     name: Optional[str] = None
     path: Optional[Path] = None
 
-    def __init__(self, path: Path, name: Optional[str] = None, *args, **kwargs):
+    def __init__(
+        self, path: Optional[Path] = None, name: Optional[str] = None, *args, **kwargs
+    ):
         super().__init__(self, *args, **kwargs)
-        if not name:
+        if path and not name:
             name = self._get_name_from_path(path)
+
+        if name and not path:
+            path = self._get_path_from_name(name)
 
         self.path = path
         self.name = name
@@ -95,13 +101,26 @@ class ModuleComponent(Component):
         return inspect.isabstract(_class)
 
     @staticmethod
+    def _get_path_from_name(name: str):
+        obj = importlib.import_module(name)
+        module_path = name.replace(".", "/")
+        if inspect.ismodule(obj):
+            path = f"{module_path}.py"
+        else:
+            path = f"{module_path}/__init__.py"
+
+        return Path(path)
+
+    @staticmethod
     def _get_name_from_path(path: Path):
         if "__init__.py" == path.name:
             package = os.path.dirname(path)
             return os.path.split(package)[-1]
 
-        else:
-            return path.stem
+        parent_name = str(path.parent).replace("/", ".")
+        name = f"{parent_name}.{path.stem}"
+
+        return name
 
     def get_abstraction(self):
         for module_class in self._get_classes():
@@ -125,8 +144,33 @@ class ModuleComponent(Component):
 
         return classes
 
-    def get_instability(self):
-        pass
+    def _get_dependencies(self):
+        with open(self.path, "r") as archivo:
+            tree_imports = ast.parse(archivo.read())
+
+        _imports = set()
+
+        for node in ast.walk(tree_imports):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    _imports.add(alias.name)
+            elif isinstance(node, ast.ImportFrom):
+                _imports.add(node.module)
+
+        return _imports
+
+    def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
+        dependencies = self._get_dependencies()
+
+        for module in dependencies:
+            if ignore_dependencies and module in ignore_dependencies:
+                continue
+
+            dep_comp = ModuleComponent(name=module)
+            self.add_dependency(dep_comp)
+
+        self.calculate_instability()
+        return self.instability
 
 
 class ModuleComponentLoader(ComponentLoader):

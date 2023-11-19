@@ -96,22 +96,25 @@ def tests_calculate_abstraction(
     [
         (
             ModuleComponent(
-                path=root_stub_project / Path("/module_1.py"),
-                name="module_a1",
+                path=root_stub_project / Path("module_1.py"),
             ),
             1,
         ),
         (
             ModuleComponent(
                 path=root_stub_project / Path("package_a/module_a2.py"),
-                name="module_a2",
+                internal_dependencies=[
+                    ModuleComponent(path=root_stub_project / Path("module_1.py"))
+                ],
             ),
             0,
         ),
         (
             ModuleComponent(
                 path=root_stub_project / Path("package_a/module_a1.py"),
-                name="module_a2",
+                internal_dependencies=[
+                    ModuleComponent(path=root_stub_project / Path("module_1.py"))
+                ],
             ),
             0,
         ),
@@ -120,5 +123,5 @@ def tests_calculate_abstraction(
 def tests_calculate_inestability(
     component: ModuleComponent, expected_inestability: float
 ):
-    inestability = component.get_instability()
+    inestability = component.get_instability(ignore_dependencies=["abc"])
     assert inestability == expected_inestability
