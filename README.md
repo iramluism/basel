@@ -54,7 +54,8 @@ poetry run coverage report
 
 ### Basic Usage
 
-Warning: These instructions are for local development, still is not ready to implement witt pre-commit or as any python package distribution.
+> [!WARNING] 
+> These instructions are for local development, still is not ready to implement witt pre-commit or as any python package distribution.
 
 1. Clone the repository on your local machine
    ```
