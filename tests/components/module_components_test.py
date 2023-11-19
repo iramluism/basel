@@ -117,7 +117,7 @@ def tests_calculate_abstraction(
         ),
     ],
 )
-def tests_calculate_abstraction(
+def tests_calculate_inestability(
     component: ModuleComponent, expected_inestability: float
 ):
     inestability = component.get_instability()

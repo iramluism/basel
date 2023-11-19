@@ -7,26 +7,26 @@ repos:
   - id: autoflake
     name: "autoflake: reformat unused imports and variables"
     entry: autoflake
-    files: contrall
+    files: "basel|tests"
     language: python
     args: [--remove-all-unused-imports, --in-place]
   - id: isort
     name: "isort: reformat imports (order and remove duplicated imports)"
     language: python
-    files: contrall
+    files: "basel|tests"
     entry: isort
     stages: [commit]
     args: [--cr setup.cfg]
     
   - id: black
     name: "black: reformat python code (max line length, syntax, double quotes, etc)"
-    files: contrall
+    files: "basel|tests"
     entry: black
     language: python
 
   - id: flake8
     name: "flake8: check python code"
     stages: [commit]
-    files: contrall
+    files: "basel|tests"
     language: system
     entry: flake8 --config setup.cfg
