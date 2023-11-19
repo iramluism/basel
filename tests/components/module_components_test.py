@@ -89,3 +89,36 @@ def tests_calculate_abstraction(
 ):
     abstraction = component.get_abstraction()
     assert abstraction == expected_abstraction
+
+
+@pytest.mark.parametrize(
+    "component,expected_inestability",
+    [
+        (
+            ModuleComponent(
+                path=root_stub_project / Path("/module_1.py"),
+                name="module_a1",
+            ),
+            1,
+        ),
+        (
+            ModuleComponent(
+                path=root_stub_project / Path("package_a/module_a2.py"),
+                name="module_a2",
+            ),
+            0,
+        ),
+        (
+            ModuleComponent(
+                path=root_stub_project / Path("package_a/module_a1.py"),
+                name="module_a2",
+            ),
+            0,
+        ),
+    ],
+)
+def tests_calculate_abstraction(
+    component: ModuleComponent, expected_inestability: float
+):
+    inestability = component.get_instability()
+    assert inestability == expected_inestability
