@@ -61,7 +61,15 @@ class Component(metaclass=abc.ABCMeta):
         return abstraction
 
     def calculate_instability(self):
-        raise NotImplementedError()
+        instability = 1
+        n_external_deps = len(self.external_dependencies)
+        n_deps = n_external_deps + len(self.internal_dependencies)
+
+        if n_deps:
+            instability = n_external_deps / n_deps
+
+        self.instability = instability
+        return instability
 
 
 class ComponentLoader(metaclass=abc.ABCMeta):
