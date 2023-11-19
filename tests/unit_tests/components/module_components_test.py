@@ -44,15 +44,12 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a2.py"),
-                    name="module_a2",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
-                    name="module_a1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/__init__.py"),
-                    name="package_a",
                 ),
             ],
         ),
@@ -71,14 +68,12 @@ def test_load_components(root_module: Path, expected_components: List[ModuleComp
         (
             ModuleComponent(
                 path=root_stub_project / Path("package_a/module_a1.py"),
-                name="module_a1",
             ),
             1,
         ),
         (
             ModuleComponent(
                 path=root_stub_project / Path("package_a/module_a2.py"),
-                name="module_a2",
             ),
             0.5,
         ),

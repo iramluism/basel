@@ -1,13 +1,17 @@
 import abc
 import ast
+from collections import namedtuple
 from dataclasses import dataclass
 import importlib
 import inspect
 import os
 from pathlib import Path
+from typing import Dict
 from typing import List
 from typing import NoReturn
 from typing import Optional
+
+ASPoint = namedtuple("ASPoint", ["x", "y"])
 
 
 @dataclass
@@ -16,13 +20,15 @@ class Component(metaclass=abc.ABCMeta):
         self,
         abstraction: Optional[float] = None,
         instability: Optional[float] = None,
+        distance: Optional[float] = None,
         external_dependencies: Optional[float] = None,
         internal_dependencies: Optional[float] = None,
         no_abstract_classes: Optional[float] = None,
         abstract_classes: Optional[float] = None,
     ):
-        self.abstraction = abstraction
-        self.instability = instability
+        self.abstraction = abstraction or 1
+        self.instability = instability or 1
+        self.distance = distance or 0
 
         self.external_dependencies = external_dependencies or []
         self.internal_dependencies = internal_dependencies or []
@@ -43,12 +49,29 @@ class Component(metaclass=abc.ABCMeta):
             self.no_abstract_classes.append(_class)
 
     @abc.abstractmethod
+    def get_dependencies(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def get_abstraction(self):
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
         raise NotImplementedError()
+
+    def get_distance(self) -> float:
+        return self.distance
+
+    def calculate_distance(self):
+        abstraction = self.abstraction
+        instability = self.instability
+
+        distance = abs(abstraction + instability - 1)
+
+        self.distance = distance
+
+        return self.distance
 
     def calculate_abstraction(self):
         abstraction = 1
@@ -113,14 +136,12 @@ class ModuleComponent(Component):
 
     @staticmethod
     def _get_name_from_path(path: Path):
-        if "__init__.py" == path.name:
-            package = os.path.dirname(path)
-            return os.path.split(package)[-1]
-
         parent_name = str(path.parent).replace("/", ".")
-        name = f"{parent_name}.{path.stem}"
 
-        return name
+        if "__init__.py" == path.name:
+            return parent_name
+        else:
+            return f"{parent_name}.{path.stem}"
 
     def get_abstraction(self):
         for module_class in self._get_classes():
@@ -134,17 +155,15 @@ class ModuleComponent(Component):
 
     def _get_classes(self):
         classes = []
-        package_path = str(self.path.parent).replace("/", ".")
-        module_path = f"{package_path}.{self.name}"
 
-        module = importlib.import_module(module_path)
+        module = importlib.import_module(self.name)
         for module_name, obj in inspect.getmembers(module):
             if inspect.isclass(obj):
                 classes.append(obj)
 
         return classes
 
-    def _get_dependencies(self):
+    def get_dependencies(self):
         with open(self.path, "r") as archivo:
             tree_imports = ast.parse(archivo.read())
 
@@ -159,8 +178,11 @@ class ModuleComponent(Component):
 
         return _imports
 
-    def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
-        dependencies = self._get_dependencies()
+    def load_dependencies(self, ignore_dependencies: Optional[List[str]] = None):
+        if self.external_dependencies:
+            return None
+
+        dependencies = self.get_dependencies()
 
         for module in dependencies:
             if ignore_dependencies and module in ignore_dependencies:
@@ -169,22 +191,41 @@ class ModuleComponent(Component):
             dep_comp = ModuleComponent(name=module)
             self.add_dependency(dep_comp)
 
+    def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
+        self.load_dependencies(ignore_dependencies=ignore_dependencies)
         self.calculate_instability()
         return self.instability
 
 
 class ModuleComponentLoader(ComponentLoader):
-    def __init__(self, root_path=None):
+    def __init__(
+        self,
+        root_path=None,
+        components: Optional[Dict[str, ModuleComponent]] = None,
+        ignore_dependencies: Optional[List[str]] = None,
+    ):
         self.root_path = root_path
-        self.components = {}
+        self.components = components or {}
+        self.ignore_dependencies = ignore_dependencies
 
-    def load_components(self, root_path: str) -> NoReturn:
-        if root_path in self.components:
-            return None
+    def load_components(self, root_path: Optional[Path] = None) -> NoReturn:
+        if not root_path:
+            root_path = self.root_path
 
+        self._load_components(root_path)
+        self._load_dependencies()
+
+    def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
             component = ModuleComponent(path=module)
-            self.components[str(module)] = component
+            self.components[component.name] = component
+
+    def _load_dependencies(self):
+        for component_name, component in self.components.items():
+            component.load_dependencies(ignore_dependencies=self.ignore_dependencies)
+            for comp_deps in component.external_dependencies:
+                if comp_deps.name in self.components:
+                    comp_deps.add_dependency(component, is_internal=True)
 
     def _find_py_modules(self, root, modules) -> List[Path]:
         py_modules = []
@@ -196,6 +237,30 @@ class ModuleComponentLoader(ComponentLoader):
             py_modules.append(module_path)
 
         return py_modules
+
+    def get_as_plane(self) -> Dict[str, ASPoint]:
+        as_plane = {}
+        for component_name, component in self.components.items():
+            instability = component.get_instability()
+            abstraction = component.get_abstraction()
+            as_point = ASPoint(x=instability, y=abstraction)
+
+            as_plane[component_name] = as_point
+
+        return as_plane
+
+    def calculate_main_distance(self):
+        main_distance = 0
+        distances = []
+
+        for component_name, component in self.components.items():
+            comp_distance = component.get_distance()
+            distances.append(comp_distance)
+
+        if distances:
+            main_distance = sum(distances) / len(distances)
+
+        return main_distance
 
     def get_py_modules(self, root_path: str):
         py_modules = []
