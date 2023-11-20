@@ -8,9 +8,9 @@ from typing import List
 from typing import NoReturn
 from typing import Optional
 
-from src.dtos import ASPoint
-from src.icomponents import Component
-from src.icomponents import ComponentLoader
+from basel.dtos import ASPoint
+from basel.icomponents import Component
+from basel.icomponents import ComponentLoader
 
 
 class ModuleComponent(Component):
@@ -30,7 +30,7 @@ class ModuleComponent(Component):
 
         self.path = path
         self.name = name
-    
+
     def is_package(self):
         return self.path.name == self.package_module
 
@@ -139,9 +139,8 @@ class ModuleComponent(Component):
 
 
 class ModuleComponentLoader(ComponentLoader):
-    
     components: Dict[str, ModuleComponent]
-    
+
     def __init__(self, root_path=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.root_path = root_path
@@ -151,33 +150,34 @@ class ModuleComponentLoader(ComponentLoader):
         self.ignore_deps(["abc", "typing"])
 
     def load_components(
-        self, 
-        root_path: Optional[Path] = None, 
+        self,
+        root_path: Optional[Path] = None,
         ignore_dependencies: Optional[List[str]] = None,
         exclude_components: Optional[List[str]] = None,
         exclude_packages: bool = False,
     ) -> NoReturn:
-    
         if not root_path:
             root_path = self.root_path
-        
+
         self._load_components(root_path)
         self._remove_components(exclude_components, exclude_packages)
         self.ignore_deps(exclude_components or [])
         self._load_dependencies(ignore_dependencies)
         self._load_classes()
-        
+
     def _remove_components(
-        self, components: Optional[List[str]] = None, exclude_packages: bool = False,):
-        
+        self,
+        components: Optional[List[str]] = None,
+        exclude_packages: bool = False,
+    ):
         if not components:
             components = []
-        
+
         for comp_name in list(self.components):
             comp = self.components[comp_name]
             if comp_name in components or (exclude_packages and comp.is_package()):
                 self.components.pop(comp_name)
-        
+
     def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
             component = ModuleComponent(path=module)
@@ -188,12 +188,11 @@ class ModuleComponentLoader(ComponentLoader):
             component.load_classes()
 
     def _load_dependencies(self, ignore_dependencies: Optional[List[str]] = None):
-        
         if not ignore_dependencies:
             ignore_dependencies = []
-        
+
         ignore_dependencies += self.ignore_dependencies
-        
+
         for component_name, component in self.components.items():
             component.load_dependencies(ignore_dependencies=ignore_dependencies)
             self.components[component_name] = component

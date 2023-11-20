@@ -1,10 +1,10 @@
 import argparse
 from pathlib import Path
 
-from src import config
-from src.client import Basel
-from src.components import ModuleComponentLoader
-from src.views import ConsoleView
+from basel import config
+from basel.client import Basel
+from basel.components import ModuleComponentLoader
+from basel.views import ConsoleView
 
 COMMANDS = {
     "report": {

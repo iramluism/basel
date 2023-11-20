@@ -4,7 +4,7 @@ from typing import List
 from typing import NoReturn
 from typing import Optional
 
-from src.dtos import ASPoint
+from basel.dtos import ASPoint
 
 
 class Component(metaclass=abc.ABCMeta):

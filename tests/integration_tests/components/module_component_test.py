@@ -1,8 +1,7 @@
 from pathlib import Path
 
+from basel.components import ModuleComponentLoader
 import pytest
-
-from src.components import ModuleComponentLoader
 
 IGONORE_DEPENDENCIES = ["abc"]
 

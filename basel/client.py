@@ -1,13 +1,13 @@
+from pathlib import Path
 from typing import Any
 from typing import Dict
 from typing import List
-from pathlib import Path
 from typing import Optional
 
-from src.components import ComponentLoader
-from src.dtos import ASPoint
-from src.dtos import Report
-from src.views import View
+from basel.components import ComponentLoader
+from basel.dtos import ASPoint
+from basel.dtos import Report
+from basel.views import View
 
 
 class Basel:
@@ -33,8 +33,16 @@ class Basel:
 
         return formatted_data
 
-    def report(self, root_path: Path, ignore_dependencies: Optional[List[str]] = None, exclude_components: Optional[List[str]] = None, exclude_packages: bool = False):
-        self.loader.load_components(root_path, ignore_dependencies, exclude_components, exclude_packages)
+    def report(
+        self,
+        root_path: Path,
+        ignore_dependencies: Optional[List[str]] = None,
+        exclude_components: Optional[List[str]] = None,
+        exclude_packages: bool = False,
+    ):
+        self.loader.load_components(
+            root_path, ignore_dependencies, exclude_components, exclude_packages
+        )
 
         as_plane = self.loader.get_as_plane()
         mean_distance = self.loader.calculate_main_distance()

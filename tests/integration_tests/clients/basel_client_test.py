@@ -1,12 +1,11 @@
 from pathlib import Path
 from unittest.mock import Mock
 
+from basel.client import Basel
+from basel.components import ModuleComponentLoader
+from basel.dtos import Report
+from basel.views import View
 import pytest
-
-from src.client import Basel
-from src.components import ModuleComponentLoader
-from src.dtos import Report
-from src.views import View
 
 IGNORE_DEPENDENCIES = ["abc"]
 REPORT_COLUMNS = ["Component", "I", "A", "D"]
