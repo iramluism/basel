@@ -98,8 +98,8 @@ class ComponentLoader(metaclass=abc.ABCMeta):
         self.ignore_dependencies = ignore_dependencies or []
         self.components = components or {}
 
-    def ignore_deps(self, dependencies):
-        self.ignore_dependencies.extend(dependencies)
+    def ignore_deps(self, dependencies: Optional[List[str]] = None):
+        self.ignore_dependencies.extend(dependencies or [])
 
     @abc.abstractmethod
     def load_components(self, *args, **kwargs) -> Component:

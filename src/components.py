@@ -149,14 +149,15 @@ class ModuleComponentLoader(ComponentLoader):
         self, 
         root_path: Optional[Path] = None, 
         ignore_dependencies: Optional[List[str]] = None,
-        exclude: Optional[List[str]] = None,
+        exclude_components: Optional[List[str]] = None,
     ) -> NoReturn:
     
         if not root_path:
             root_path = self.root_path
-
+        
         self._load_components(root_path)
-        self._remove_components(exclude)
+        self._remove_components(exclude_components)
+        self.ignore_deps(exclude_components)
         self._load_dependencies(ignore_dependencies)
         self._load_classes()
         

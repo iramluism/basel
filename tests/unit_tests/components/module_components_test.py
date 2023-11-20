@@ -89,7 +89,7 @@ def test_load_components(
     exclude_components: List[str],
 ):
     loader = ModuleComponentLoader()
-    loader.load_components(root_module, exclude=exclude_components)
+    loader.load_components(root_module, exclude_components=exclude_components)
 
     components = loader.get_components()
     for component, expected_component in zip(components, expected_components):
