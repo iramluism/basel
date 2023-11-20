@@ -1,7 +1,7 @@
 
 ## Basel Library
 
-This library is to calculate the abstraction and the stability of a project
+This library calculates the abstraction and the stability of a project
 
 #### Clone repository
 
@@ -22,7 +22,7 @@ git clone
 ````
 
 
-#### Languages and frameworks of project
+#### Languages and frameworks of the project
 ````
 * Python 3.10.12
 
@@ -40,7 +40,7 @@ poetry install
 
 #### Run tests
 
-Run from project root directory
+Run from the project root directory
 
 ````
 poetry run pytest -vv
@@ -55,14 +55,14 @@ poetry run coverage report
 ### Basic Usage
 
 > [!WARNING] 
-> These instructions are for local development, still is not ready to implement with pre-commit or as any python package distribution.
+> These instructions are for local development, still not ready to implement with pre-commit or as any Python package distribution.
 
 1. Clone the repository on your local machine
    ```
    git clone git@github.com:iramluism/basel.git
    ```
 2. Go to your desired project 
-3. install the basel library as editable mode 
+3. install the basel library in editable mode 
    
    Using pip
    ```
@@ -80,9 +80,9 @@ poetry run coverage report
     ```
 
 ### Examples
-In this repository there are two differents project that can help you to understand how basel works. In this little projects the components are mixed and related to all of them, and with diferents kind of python importations, with abstract class. check the `tests/stubs` for more details. We can try with one of them
+In this repository, two different projects can help you to understand how Basel works. In these little projects, the components are mixed and related to all of them, and with different kinds of Python importations, with abstract classes. check the `tests/stubs` for more details. We can try with one of them
 
-First and the main command in this library is `report`. 
+The first and main command in this library is `report`. 
 ```
 python -m basel report --path tests/stubs/stub_project_a
 ```
@@ -97,15 +97,15 @@ tests.stubs.stub_project_a.package_b.module_b1  0.5   0    0.5
 tests.stubs.stub_project_a.package_b            1     1    1
 tests.stubs.stub_project_a.package_b.module_b2  1     0    0
 tests.stubs.stub_project_a.package_a.module_a2  0     0.5  0.5
-tests.stubs.stub_project_a.package_a.module_a1  0.33  1    0.33
+tests.stubs.stub_project_a.package_a.module_a1  0.25  1    0.25
 tests.stubs.stub_project_a.package_a            1     1    1
-Mean Distance: 0.59
+Mean Distance: 0.58
 ```
-This command print a table with the components, the instability (I), the abstractions (A) and the distance (D) from this point (I,A) to the main sequence
+This command prints a table with the components, the instability (I), the abstractions (A), and the distance (D) from this point (I, A) to the main sequence
 
-Check the `tests.stubs.stub_project_a` component, this has an abstraction and an instability of 1, it mean that this component is unusefull. If you check in the project this is a python package, and there are nothing in the ``__init__.py``. 
+Check the `tests.stubs.stub_project_a` component, this has an abstraction and an instability of 1, which means that this component is unuseful. If you check in the project this is a Python package, and there is nothing in the ``__init__.py``. 
 
-Also, you can ignore some dependencies throughtout the software evaluation.
+Also, you can ignore some dependencies throughout the software evaluation.
 To do this use the `--ignore-dependencies` argument.
 
 ```
@@ -113,18 +113,18 @@ To do this use the `--ignore-dependencies` argument.
 ```
 You can see something like that
 ```
-Component                                         I    A    D
-----------------------------------------------  ---  ---  ---
-tests.stubs.stub_project_a                        1  1    1
-tests.stubs.stub_project_a.module_1               1  0    0
-tests.stubs.stub_project_a.package_b.module_b3    1  1    1
-tests.stubs.stub_project_a.package_b.module_b1    0  0.5  0.5
-tests.stubs.stub_project_a.package_b              1  1    1
-tests.stubs.stub_project_a.package_b.module_b2    1  0.5  0.5
-tests.stubs.stub_project_a.package_a.module_a2    0  0.5  0.5
-tests.stubs.stub_project_a.package_a.module_a1    1  1    1
-tests.stubs.stub_project_a.package_a              1  1    1
-Mean Distance: 0.72
+Component                                         I     A     D
+----------------------------------------------  ---  ----  ----
+tests.stubs.stub_project_a                        1  1     1
+tests.stubs.stub_project_a.module_1               1  0.33  0.33
+tests.stubs.stub_project_a.package_b.module_b3    1  1     1
+tests.stubs.stub_project_a.package_b.module_b1    0  0.5   0.5
+tests.stubs.stub_project_a.package_b              1  1     1
+tests.stubs.stub_project_a.package_b.module_b2    1  0.5   0.5
+tests.stubs.stub_project_a.package_a.module_a2    0  0.5   0.5
+tests.stubs.stub_project_a.package_a.module_a1    1  1     1
+tests.stubs.stub_project_a.package_a              1  1     1
+Mean Distance: 0.76
 ```
 
-We are ignoring the `tests.stubs.stub_project_a.package_a.module_a1` component.  If you note, in the above command output this module had an abstraction of 1 and instability of 0.33 and right now has 1 to both metrics. So, we are isolation this component from the rest of the architecture. This is useful when you can ignore the incoming dependencies of a specific module and evaluate the project stability with the rest of the components, e.x Evaluate the domain and infrastructure layers independently.
+We are ignoring the `tests.stubs.stub_project_a.package_a.module_a1` component.  If you note, in the above command output this module had an abstraction of 1 and instability of 0.25 and right now has 1 to both metrics. So, we are isolation this component from the rest of the architecture. This is useful when you can ignore the incoming dependencies of a specific module and evaluate the project stability with the rest of the components, e.x Evaluate the domain and infrastructure layers independently.
