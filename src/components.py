@@ -16,6 +16,7 @@ from src.icomponents import ComponentLoader
 class ModuleComponent(Component):
     name: Optional[str] = None
     path: Optional[Path] = None
+    package_module = "__init__.py"
 
     def __init__(
         self, path: Optional[Path] = None, name: Optional[str] = None, *args, **kwargs
@@ -29,27 +30,28 @@ class ModuleComponent(Component):
 
         self.path = path
         self.name = name
+    
+    def is_package(self):
+        return self.path.name == self.package_module
 
     @staticmethod
     def _is_abstract_class(_class):
         return inspect.isabstract(_class)
 
-    @staticmethod
-    def _get_path_from_name(name: str):
+    def _get_path_from_name(self, name: str):
         obj = importlib.import_module(name)
         module_path = name.replace(".", "/")
         if inspect.ismodule(obj):
             path = f"{module_path}.py"
         else:
-            path = f"{module_path}/__init__.py"
+            path = f"{module_path}/{self.package_module}"
 
         return Path(path)
 
-    @staticmethod
-    def _get_name_from_path(path: Path):
+    def _get_name_from_path(self, path: Path):
         parent_name = str(path.parent).replace("/", ".")
 
-        if "__init__.py" == path.name:
+        if self.package_module == path.name:
             return parent_name
         else:
             return f"{parent_name}.{path.stem}"
@@ -137,6 +139,9 @@ class ModuleComponent(Component):
 
 
 class ModuleComponentLoader(ComponentLoader):
+    
+    components: Dict[str, ModuleComponent]
+    
     def __init__(self, root_path=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.root_path = root_path
@@ -150,20 +155,28 @@ class ModuleComponentLoader(ComponentLoader):
         root_path: Optional[Path] = None, 
         ignore_dependencies: Optional[List[str]] = None,
         exclude_components: Optional[List[str]] = None,
+        exclude_packages: bool = False,
     ) -> NoReturn:
     
         if not root_path:
             root_path = self.root_path
         
         self._load_components(root_path)
-        self._remove_components(exclude_components)
+        self._remove_components(exclude_components, exclude_packages)
         self.ignore_deps(exclude_components or [])
         self._load_dependencies(ignore_dependencies)
         self._load_classes()
         
-    def _remove_components(self, components: Optional[List[str]] = None):
-        for component in components or []:
-            self.components.pop(component)
+    def _remove_components(
+        self, components: Optional[List[str]] = None, exclude_packages: bool = False,):
+        
+        if not components:
+            components = []
+        
+        for comp_name in list(self.components):
+            comp = self.components[comp_name]
+            if comp_name in components or (exclude_packages and comp.is_package()):
+                self.components.pop(comp_name)
         
     def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
