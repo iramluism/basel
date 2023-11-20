@@ -157,7 +157,7 @@ class ModuleComponentLoader(ComponentLoader):
         
         self._load_components(root_path)
         self._remove_components(exclude_components)
-        self.ignore_deps(exclude_components)
+        self.ignore_deps(exclude_components or [])
         self._load_dependencies(ignore_dependencies)
         self._load_classes()
         

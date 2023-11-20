@@ -1,5 +1,5 @@
-from tests.stubs.stub_project.package_a.module_a1 import AbstractClass1A1
-from tests.stubs.stub_project.package_a.module_a2 import AbstractClass1A2
+from tests.stubs.stub_project_a.package_a.module_a1 import AbstractClass1A1
+from tests.stubs.stub_project_a.package_a.module_a2 import AbstractClass1A2
 
 
 class ConcretClass1A1(AbstractClass1A1):
