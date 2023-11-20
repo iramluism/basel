@@ -32,7 +32,7 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
 
 
 @pytest.mark.parametrize(
-    "root_module,expected_components",
+    "root_module,expected_components,exclude_components",
     [
         (
             root_stub_project,
@@ -58,12 +58,38 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
                     name="tests.stubs.stub_project.package_a",
                 ),
             ],
+            None,
+        ),
+        (
+            root_stub_project,
+            [
+                ModuleComponent(
+                    path=root_stub_project / Path("module_1.py"),
+                    name="tests.stubs.stub_project.module_1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/module_a1.py"),
+                    name="tests.stubs.stub_project.package_a.module_a1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/__init__.py"),
+                    name="tests.stubs.stub_project.package_a",
+                ),
+            ],
+            [
+                "tests.stubs.stub_project",
+                "tests.stubs.stub_project.package_a.module_a2",
+            ],
         ),
     ],
 )
-def test_load_components(root_module: Path, expected_components: List[ModuleComponent]):
+def test_load_components(
+    root_module: Path,
+    expected_components: List[ModuleComponent],
+    exclude_components: List[str],
+):
     loader = ModuleComponentLoader()
-    loader.load_components(root_module)
+    loader.load_components(root_module, exclude=exclude_components)
 
     components = loader.get_components()
     for component, expected_component in zip(components, expected_components):

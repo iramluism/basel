@@ -145,14 +145,25 @@ class ModuleComponentLoader(ComponentLoader):
     def _ignore_native_library(self):
         self.ignore_deps(["abc", "typing"])
 
-    def load_components(self, root_path: Optional[Path] = None, ignore_dependencies: Optional[List[str]] = None) -> NoReturn:
+    def load_components(
+        self, 
+        root_path: Optional[Path] = None, 
+        ignore_dependencies: Optional[List[str]] = None,
+        exclude: Optional[List[str]] = None,
+    ) -> NoReturn:
+    
         if not root_path:
             root_path = self.root_path
 
         self._load_components(root_path)
+        self._remove_components(exclude)
         self._load_dependencies(ignore_dependencies)
         self._load_classes()
-
+        
+    def _remove_components(self, components: Optional[List[str]] = None):
+        for component in components or []:
+            self.components.pop(component)
+        
     def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
             component = ModuleComponent(path=module)
