@@ -16,6 +16,7 @@ root_stub_project = Path("tests/stubs/stub_project")
             [
                 root_stub_project / Path("__init__.py"),
                 root_stub_project / Path("module_1.py"),
+                root_stub_project / Path("package_b/module_b1.py"),
                 root_stub_project / Path("package_a/module_a2.py"),
                 root_stub_project / Path("package_a/module_a1.py"),
                 root_stub_project / Path("package_a/__init__.py"),
@@ -38,19 +39,18 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
             [
                 ModuleComponent(
                     path=root_stub_project / Path("__init__.py"),
-                    name="tests.stubs.stub_project",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("module_1.py"),
-                    name="tests.stubs.stub_project.module_1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a2.py"),
-                    name="tests.stubs.stub_project.package_a.module_a2",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
-                    name="tests.stubs.stub_project.package_a.module_a1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/__init__.py"),
@@ -65,15 +65,15 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
             [
                 ModuleComponent(
                     path=root_stub_project / Path("module_1.py"),
-                    name="tests.stubs.stub_project.module_1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a2.py"),
-                    name="tests.stubs.stub_project.package_a.module_a2",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
-                    name="tests.stubs.stub_project.package_a.module_a1",
                 ),
             ],
             None,
@@ -84,20 +84,20 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
             [
                 ModuleComponent(
                     path=root_stub_project / Path("module_1.py"),
-                    name="tests.stubs.stub_project.module_1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
-                    name="tests.stubs.stub_project.package_a.module_a1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/__init__.py"),
-                    name="tests.stubs.stub_project.package_a",
                 ),
             ],
             [
-                "tests.stubs.stub_project",
-                "tests.stubs.stub_project.package_a.module_a2",
+                "tests/stubs/stub_project/__init__.py",
+                "tests/stubs/stub_project/package_a/module_a2.py",
             ],
             False,
         ),

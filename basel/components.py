@@ -1,6 +1,5 @@
 import ast
 import importlib
-import inspect
 import os
 from pathlib import Path
 from typing import Dict
@@ -19,42 +18,21 @@ class ModuleComponent(Component):
     package_module = "__init__.py"
 
     def __init__(
-        self, path: Optional[Path] = None, name: Optional[str] = None, *args, **kwargs
+        self,
+        root_path: Optional[Path] = None,
+        path: Optional[Path] = None,
+        name: Optional[str] = None,
+        *args,
+        **kwargs,
     ):
         super().__init__(self, *args, **kwargs)
-        if path and not name:
-            name = self._get_name_from_path(path)
-
-        if name and not path:
-            path = self._get_path_from_name(name)
 
         self.path = path
-        self.name = name
+        self.root_path = root_path
+        self.name = str(path)
 
     def is_package(self):
-        return self.path.name == self.package_module
-
-    @staticmethod
-    def _is_abstract_class(_class):
-        return inspect.isabstract(_class)
-
-    def _get_path_from_name(self, name: str):
-        obj = importlib.import_module(name)
-        module_path = name.replace(".", "/")
-        if inspect.ismodule(obj):
-            path = f"{module_path}.py"
-        else:
-            path = f"{module_path}/{self.package_module}"
-
-        return Path(path)
-
-    def _get_name_from_path(self, path: Path):
-        parent_name = str(path.parent).replace("/", ".")
-
-        if self.package_module == path.name:
-            return parent_name
-        else:
-            return f"{parent_name}.{path.stem}"
+        return self.path.match(self.package_module)
 
     def get_abstraction(self):
         self.load_classes()
@@ -68,18 +46,6 @@ class ModuleComponent(Component):
 
         return False
 
-    def load_classes(self):
-        if self.no_abstract_classes or self.abstract_classes:
-            return None
-
-        module = importlib.import_module(self.name)
-        for module_name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and not self.depend_of(obj.__module__):
-                self.add_class(
-                    _class=obj,
-                    is_abstract=self._is_abstract_class(obj),
-                )
-
     @staticmethod
     def _import_module(module_path):
         try:
@@ -88,12 +54,20 @@ class ModuleComponent(Component):
         except ImportError:
             pass
 
+    def _get_import_path(self, _import):
+        mod_path = _import.replace(".", "/") + ".py"
+        abs_path = os.path.abspath(mod_path)
+        if os.path.exists(abs_path):
+            return Path(abs_path).relative_to(os.getcwd())
+
+        return _import
+
     def _eval_dependency(self, dep) -> set:
         _imports = set()
 
         if isinstance(dep, ast.Import):
             for alias in dep.names:
-                _imports.add(alias.name)
+                _imports.add(self._get_import_path(alias.name))
         elif isinstance(dep, ast.ImportFrom):
             modules = set()
 
@@ -101,11 +75,11 @@ class ModuleComponent(Component):
                 module_path = f"{dep.module}.{alias.name}"
                 module = self._import_module(module_path)
                 if module:
-                    modules.add(module_path)
+                    modules.add(self._get_import_path(module_path))
 
             _imports = _imports | modules
             if len(modules) != len(dep.names):
-                _imports.add(dep.module)
+                _imports.add(self._get_import_path(dep.module))
 
         return _imports
 
@@ -120,6 +94,24 @@ class ModuleComponent(Component):
 
         return _imports
 
+    def load_classes(self):
+        with open(self.path, "r") as archivo:
+            ast_tree = ast.parse(archivo.read())
+
+        _imports = set()
+        for node in ast.walk(ast_tree):
+            if isinstance(node, ast.ClassDef):
+                self.add_class(node, is_abstract=self._is_abstract_class(node))
+
+        return _imports
+
+    def _is_abstract_class(self, _class: ast.ClassDef):
+        for keyword in _class.keywords:
+            if keyword.arg == "metaclass" and keyword.value.attr == "ABCMeta":
+                return True
+
+        return False
+
     def load_dependencies(self, ignore_dependencies: Optional[List[str]] = None):
         if self.external_dependencies:
             return None
@@ -130,7 +122,7 @@ class ModuleComponent(Component):
             if ignore_dependencies and module in ignore_dependencies:
                 continue
 
-            dep_comp = ModuleComponent(name=module)
+            dep_comp = ModuleComponent(root_path=self.root_path, path=module)
             self.add_dependency(dep_comp)
 
     def get_instability(self, ignore_dependencies: Optional[List[str]] = None) -> float:
@@ -167,20 +159,27 @@ class ModuleComponentLoader(ComponentLoader):
 
     def _remove_components(
         self,
-        components: Optional[List[str]] = None,
+        rules: Optional[List[str]] = None,
         exclude_packages: bool = False,
     ):
-        if not components:
-            components = []
+        if not rules:
+            rules = []
 
-        for comp_name in list(self.components):
+        if exclude_packages:
+            rules.append("__init__.py")
+
+        for comp_name, comp in list(self.components.items()):
             comp = self.components[comp_name]
-            if comp_name in components or (exclude_packages and comp.is_package()):
+
+            if any(comp.path.match(rule) for rule in rules):
                 self.components.pop(comp_name)
 
     def _load_components(self, root_path):
         for module in self.get_py_modules(root_path):
-            component = ModuleComponent(path=module)
+            component = ModuleComponent(
+                path=module,
+                root_path=root_path,
+            )
             self.components[component.name] = component
 
     def _load_classes(self):
@@ -241,9 +240,6 @@ class ModuleComponentLoader(ComponentLoader):
         py_modules = []
 
         for root, packages, modules in os.walk(root_path, topdown=True):
-            if "__init__.py" not in modules:
-                continue
-
             py_modules.extend(self._find_py_modules(root, modules))
 
         return py_modules

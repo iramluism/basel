@@ -6,27 +6,28 @@ import pytest
 IGONORE_DEPENDENCIES = ["abc"]
 
 STAB_PROJECT_PATH = Path("tests/stubs/stub_project")
-STAB_PROJECT_MAIN_DISTANCE = 0.5
+STAB_PROJECT_MAIN_DISTANCE = 0.58
 STAB_PROJECT_AS_PLANE = {
-    "tests.stubs.stub_project": (1, 1, 1),
-    "tests.stubs.stub_project.module_1": (1, 0, 0),
-    "tests.stubs.stub_project.package_a.module_a2": (0, 0.5, 0.5),
-    "tests.stubs.stub_project.package_a.module_a1": (0, 1.0, 0.0),
-    "tests.stubs.stub_project.package_a": (1, 1, 1),
+    "tests/stubs/stub_project/__init__.py": (1, 1, 1),
+    "tests/stubs/stub_project/module_1.py": (1, 0, 0),
+    "tests/stubs/stub_project/package_b/module_b1.py": (1, 1, 1),
+    "tests/stubs/stub_project/package_a/module_a2.py": (0, 0.5, 0.5),
+    "tests/stubs/stub_project/package_a/module_a1.py": (0, 1.0, 0.0),
+    "tests/stubs/stub_project/package_a/__init__.py": (1, 1, 1),
 }
 
 STAB_PROJECT_A_PATH = Path("tests/stubs/stub_project_a")
 STAB_PROJECT_A_MAIN_DISTANCE = 0.58
 STAB_PROJECT_A_AS_PLANE = {
-    "tests.stubs.stub_project_a": (1, 1, 1),
-    "tests.stubs.stub_project_a.module_1": (1, 0, 0),
-    "tests.stubs.stub_project_a.package_a.module_a2": (0, 0.5, 0.5),
-    "tests.stubs.stub_project_a.package_a.module_a1": (0.25, 1.0, 0.25),
-    "tests.stubs.stub_project_a.package_b": (1, 1, 1),
-    "tests.stubs.stub_project_a.package_b.module_b1": (0.5, 0, 0.5),
-    "tests.stubs.stub_project_a.package_b.module_b2": (1, 0, 0),
-    "tests.stubs.stub_project_a.package_b.module_b3": (1, 1, 1),
-    "tests.stubs.stub_project_a.package_a": (1, 1, 1),
+    "tests/stubs/stub_project_a/__init__.py": (1, 1, 1),
+    "tests/stubs/stub_project_a/module_1.py": (1, 0, 0),
+    "tests/stubs/stub_project_a/package_a/module_a2.py": (0, 0.5, 0.5),
+    "tests/stubs/stub_project_a/package_a/module_a1.py": (0.25, 1.0, 0.25),
+    "tests/stubs/stub_project_a/package_b/__init__.py": (1, 1, 1),
+    "tests/stubs/stub_project_a/package_b/module_b2.py": (1, 0, 0),
+    "tests/stubs/stub_project_a/package_b/module_b3.py": (1, 1, 1),
+    "tests/stubs/stub_project_a/package_b/module_b1.py": (0.5, 0, 0.5),
+    "tests/stubs/stub_project_a/package_a/__init__.py": (1, 1, 1),
 }
 
 
