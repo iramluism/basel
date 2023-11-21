@@ -106,7 +106,7 @@ class ComponentLoader(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_as_plane(self) -> Dict[str, ASPoint]:
+    def get_as_plane(self, *args, **kwargs) -> Dict[str, ASPoint]:
         raise NotImplementedError()
 
     @abc.abstractmethod

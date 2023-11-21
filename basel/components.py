@@ -210,9 +210,28 @@ class ModuleComponentLoader(ComponentLoader):
 
         return py_modules
 
-    def get_as_plane(self) -> Dict[str, ASPoint]:
+    def _filter_by_rules(
+        self, component: ModuleComponent, components_rules: Optional[List[str]] = None
+    ):
+        if components_rules:
+            for rule in components_rules:
+                if not component.path.match(rule):
+                    return False
+
+        return True
+
+    def get_as_plane(
+        self, filter_by_components: Optional[List[str]] = None
+    ) -> Dict[str, ASPoint]:
         as_plane = {}
         for component_name, component in self.components.items():
+            are_passed_all_rules = self._filter_by_rules(
+                component,
+                components_rules=filter_by_components,
+            )
+            if not are_passed_all_rules:
+                continue
+
             instability = component.get_instability()
             abstraction = component.get_abstraction()
             distance = component.get_distance()

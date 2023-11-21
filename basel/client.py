@@ -39,12 +39,13 @@ class Basel:
         ignore_dependencies: Optional[List[str]] = None,
         exclude_components: Optional[List[str]] = None,
         exclude_packages: bool = False,
+        filter_by_components: Optional[List[str]] = None,
     ):
         self.loader.load_components(
             root_path, ignore_dependencies, exclude_components, exclude_packages
         )
 
-        as_plane = self.loader.get_as_plane()
+        as_plane = self.loader.get_as_plane(filter_by_components)
         mean_distance = self.loader.calculate_main_distance()
         report = Report(
             columns=["Component", "I", "A", "D"],

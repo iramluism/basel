@@ -14,6 +14,7 @@ COMMANDS = {
             ("ignore_dependencies", "ignore_dependencies"),
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
+            ("filter", "filter_by_components"),
         ],
     }
 }
@@ -55,6 +56,10 @@ def main():
     )
     parser.add_argument(
         "--no-packages", action="store_true", help="Exculde all python package"
+    )
+
+    parser.add_argument(
+        "-f", "--filter", help="Filter Report by Components", type=cast_list_string
     )
 
     _args = parser.parse_args()

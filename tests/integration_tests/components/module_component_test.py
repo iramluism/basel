@@ -30,22 +30,36 @@ STAB_PROJECT_A_AS_PLANE = {
     "tests/stubs/stub_project_a/package_a/__init__.py": (1, 1, 1),
 }
 
+STAB_PROJECT_A_AS_PLANE_FILTER_BY_PACKAGE_B = {
+    "tests/stubs/stub_project_a/package_b/__init__.py": (1, 1, 1),
+    "tests/stubs/stub_project_a/package_b/module_b2.py": (1, 0, 0),
+    "tests/stubs/stub_project_a/package_b/module_b3.py": (1, 1, 1),
+    "tests/stubs/stub_project_a/package_b/module_b1.py": (0.5, 0, 0.5),
+}
+
 
 @pytest.mark.parametrize(
-    "root_path,expeted_as_plane",
+    "root_path,expeted_as_plane,filter_by_components",
     [
-        (STAB_PROJECT_PATH, STAB_PROJECT_AS_PLANE),
-        (STAB_PROJECT_A_PATH, STAB_PROJECT_A_AS_PLANE),
+        (STAB_PROJECT_PATH, STAB_PROJECT_AS_PLANE, None),
+        (STAB_PROJECT_A_PATH, STAB_PROJECT_A_AS_PLANE, None),
+        (
+            STAB_PROJECT_A_PATH,
+            STAB_PROJECT_A_AS_PLANE_FILTER_BY_PACKAGE_B,
+            ["package_b/*"],
+        ),
     ],
 )
-def tests_abstraction_stability_plane(root_path, expeted_as_plane):
+def tests_abstraction_stability_plane(
+    root_path, expeted_as_plane, filter_by_components
+):
     loader = ModuleComponentLoader(
         root_path=root_path, ignore_dependencies=IGONORE_DEPENDENCIES
     )
 
     loader.load_components()
 
-    as_plane = loader.get_as_plane()
+    as_plane = loader.get_as_plane(filter_by_components)
 
     assert as_plane == expeted_as_plane
 
