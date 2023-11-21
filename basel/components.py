@@ -1,5 +1,4 @@
 import ast
-import importlib
 import os
 from pathlib import Path
 from typing import Dict
@@ -28,7 +27,7 @@ class ModuleComponent(Component):
         super().__init__(self, *args, **kwargs)
 
         self.path = path
-        self.root_path = root_path
+        self.root_path = root_path or Path(os.getcwd())
         self.name = str(path)
 
     def is_package(self):
@@ -46,40 +45,33 @@ class ModuleComponent(Component):
 
         return False
 
-    @staticmethod
-    def _import_module(module_path):
-        try:
-            module = importlib.import_module(module_path)
-            return module
-        except ImportError:
-            pass
-
     def _get_import_path(self, _import):
-        mod_path = _import.replace(".", "/") + ".py"
+        mod_path = str(_import).replace(".", "/") + ".py"
         abs_path = os.path.abspath(mod_path)
         if os.path.exists(abs_path):
             return Path(abs_path).relative_to(os.getcwd())
-
-        return _import
 
     def _eval_dependency(self, dep) -> set:
         _imports = set()
 
         if isinstance(dep, ast.Import):
             for alias in dep.names:
-                _imports.add(self._get_import_path(alias.name))
+                module_path = self._get_import_path(alias.name)
+                if module_path:
+                    _imports.add(module_path)
         elif isinstance(dep, ast.ImportFrom):
             modules = set()
 
             for alias in dep.names:
-                module_path = f"{dep.module}.{alias.name}"
-                module = self._import_module(module_path)
-                if module:
-                    modules.add(self._get_import_path(module_path))
+                module_path = self._get_import_path(f"{dep.module}.{alias.name}")
+                if module_path:
+                    modules.add(module_path)
 
             _imports = _imports | modules
             if len(modules) != len(dep.names):
-                _imports.add(self._get_import_path(dep.module))
+                module_path = self._get_import_path(dep.module)
+                if module_path:
+                    _imports.add(module_path)
 
         return _imports
 
