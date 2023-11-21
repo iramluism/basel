@@ -12,8 +12,8 @@ COMMANDS = {
         "args": [
             ("path", "root_path"),
             ("ignore_dependencies", "ignore_dependencies"),
-            ("exclude_components", "exclude_components"),
-            ("exclude_packages", "exclude_packages"),
+            ("exclude", "exclude_components"),
+            ("no-packages", "exclude_packages"),
         ],
     }
 }
@@ -49,12 +49,12 @@ def main():
         help="Remove dependencies (modules, external libreries)",
     )
     parser.add_argument(
-        "--exclude-components",
+        "--exclude",
         type=cast_list_string,
         help="Exclude components from report",
     )
     parser.add_argument(
-        "--exclude-packages", action="store_true", help="Exculde all python package"
+        "--no-packages", action="store_true", help="Exculde all python package"
     )
 
     _args = parser.parse_args()
