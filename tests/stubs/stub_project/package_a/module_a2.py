@@ -1,7 +1,7 @@
 import abc
 
 
-class AbstractClass1A2(metaclass=abc.ABCMeta):
+class AbstractClass1A2(abc.ABC):
     @abc.abstractmethod
     def abstract_method_1(self):
         raise NotImplementedError()

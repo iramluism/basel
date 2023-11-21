@@ -110,6 +110,13 @@ class ModuleComponent(Component):
             if keyword.arg == "metaclass" and keyword.value.attr == "ABCMeta":
                 return True
 
+        for base in _class.bases:
+            if hasattr(base, "id") and base.id == "ABC":
+                return True
+
+            if hasattr(base, "attr") and base.attr in ["ABC", "ABCMeta"]:
+                return True
+
         return False
 
     def load_dependencies(self, ignore_dependencies: Optional[List[str]] = None):
