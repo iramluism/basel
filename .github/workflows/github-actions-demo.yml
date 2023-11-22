@@ -7,6 +7,7 @@ jobs:
     steps:
       - name: Intall Poetry
         run: pipx install poetry==1.2.0
+      - run: cd ${{ github.workspace }}
       - name: Install Dependencies
         run: poetry install
       - name: Run Tests
