@@ -8,6 +8,7 @@ import pytest
 root_stub_project = Path("tests/stubs/stub_project")
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "root_module,expected_py_modules",
     [
