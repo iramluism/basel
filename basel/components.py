@@ -118,7 +118,9 @@ class ModuleComponent(Component):
         dependencies = self.get_dependencies()
 
         for module in dependencies:
-            if ignore_dependencies and module in ignore_dependencies:
+            if ignore_dependencies and any(
+                module.match(dep) for dep in ignore_dependencies
+            ):
                 continue
 
             dep_comp = ModuleComponent(root_path=self.root_path, path=module)

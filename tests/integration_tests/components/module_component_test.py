@@ -65,17 +65,24 @@ def tests_abstraction_stability_plane(
 
 
 @pytest.mark.parametrize(
-    "root_path,expected_main_distance",
+    "root_path,ignore_dependencies,expected_mean_distance",
     [
-        (STAB_PROJECT_PATH, STAB_PROJECT_MAIN_DISTANCE),
-        (STAB_PROJECT_A_PATH, STAB_PROJECT_A_MAIN_DISTANCE),
+        (STAB_PROJECT_PATH, IGONORE_DEPENDENCIES, STAB_PROJECT_MAIN_DISTANCE),
+        (STAB_PROJECT_A_PATH, IGONORE_DEPENDENCIES, STAB_PROJECT_A_MAIN_DISTANCE),
+        (
+            STAB_PROJECT_A_PATH,
+            ["tests/stubs/stub_project_a/package_a/module_a1.py"],
+            0.72,
+        ),
     ],
 )
-def tests_calculate_main_distance(root_path: Path, expected_main_distance: float):
+def tests_calculate_mean_distance(
+    root_path: Path, ignore_dependencies, expected_mean_distance: float
+):
     loader = ModuleComponentLoader(
-        root_path=root_path, ignore_dependencies=IGONORE_DEPENDENCIES
+        root_path=root_path, ignore_dependencies=ignore_dependencies
     )
     loader.load_components()
-    main_distance = loader.calculate_main_distance()
+    mean_distance = loader.calculate_main_distance()
 
-    assert main_distance == expected_main_distance
+    assert mean_distance == expected_mean_distance
