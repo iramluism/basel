@@ -7,8 +7,23 @@ from basel.components.nodes import Node
 class Component(metaclass=abc.ABCMeta):
     def __init__(self, name: str, nodes: List[Node]) -> None:
         self.name = name
-        self.nodes = nodes
+        self.nodes = {}
+
+        for node in nodes or []:
+            self.add_node(node)
+
+    def add_node(self, node: Node):
+        self.nodes[node.name] = node
+
+    def get_node(self, node_name):
+        return self.nodes.get(node_name)
 
     def __eq__(self, component):
-        print("HOLLLLAAA", self.name, component.name)
-        return self.name == component.name
+        equal_names = self.name == component.name
+
+        for other_node in component.nodes:
+            self_node = self.get_node(other_node)
+            if not self_node:
+                return False
+
+        return equal_names

@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import List
 
-from basel.components import ModuleComponent
 from basel.components import ModuleComponentLoader
+from basel.components.modules import ModuleComponent
 import pytest
 
 root_stub_project = Path("tests/stubs/stub_project")

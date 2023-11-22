@@ -10,7 +10,6 @@ from basel.loaders import Loader
 class ModuleLoader(Loader):
     def load_components(self, paths: List[str]):
         modules = self._discover_modules(paths)
-        print(modules)
         self.add_modules(modules)
 
     def add_modules(self, modules: List[Path]):
@@ -25,8 +24,8 @@ class ModuleLoader(Loader):
         discovered_modules = []
 
         for path in paths:
-            for root, packages, modules in os.walk(path, topdown=True):
-                for module in modules:
+            for root, packages, modules in os.walk(path):
+                for module in sorted(modules):
                     if not module.endswith(".py"):
                         continue
 
