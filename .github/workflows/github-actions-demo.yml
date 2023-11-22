@@ -27,7 +27,19 @@ jobs:
         run: poetry install
 
       - name: Run Tests
-        run: poetry run coverage run -m pytest -vv   
-      
+        run: poetry run coverage run -m pytest -vv --junitxml=test_result.xml
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Test Result            # Name of the check run which will be created
+          path: test_result.xml    # Path to test results
+          reporter: jest-junit 
+
       - name: Print test coverage report
         run: poetry run coverage report
+
+      - name: Run Pre-Commit
+        uses: pre-commit/action@v3.0.0
+        
