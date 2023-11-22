@@ -3,11 +3,6 @@
 
 This library calculates the abstraction and the stability of a project
 
-#### Clone repository
-
-````
-git clone
-````
 
 #### Structure of project
 
@@ -84,47 +79,47 @@ In this repository, two different projects can help you to understand how Basel 
 
 The first and main command in this library is `report`. 
 ```
-python -m basel report --path tests/stubs/stub_project_a
+basel report --path tests/stubs/stub_project_a
 ```
 You can look something like that
 ```
-Component                                          I    A     D
-----------------------------------------------  ----  ---  ----
-tests.stubs.stub_project_a                      1     1    1
-tests.stubs.stub_project_a.module_1             1     0    0
-tests.stubs.stub_project_a.package_b.module_b3  1     1    1
-tests.stubs.stub_project_a.package_b.module_b1  0.5   0    0.5
-tests.stubs.stub_project_a.package_b            1     1    1
-tests.stubs.stub_project_a.package_b.module_b2  1     0    0
-tests.stubs.stub_project_a.package_a.module_a2  0     0.5  0.5
-tests.stubs.stub_project_a.package_a.module_a1  0.25  1    0.25
-tests.stubs.stub_project_a.package_a            1     1    1
+Component                                             I    A     D
+-------------------------------------------------  ----  ---  ----
+tests/stubs/stub_project_a/__init__.py             1     1    1
+tests/stubs/stub_project_a/module_1.py             1     0    0
+tests/stubs/stub_project_a/package_b/module_b3.py  1     1    1
+tests/stubs/stub_project_a/package_b/module_b1.py  0.5   0    0.5
+tests/stubs/stub_project_a/package_b/__init__.py   1     1    1
+tests/stubs/stub_project_a/package_b/module_b2.py  1     0    0
+tests/stubs/stub_project_a/package_a/module_a2.py  0     0.5  0.5
+tests/stubs/stub_project_a/package_a/module_a1.py  0.25  1    0.25
+tests/stubs/stub_project_a/package_a/__init__.py   1     1    1
 Mean Distance: 0.58
 ```
 This command prints a table with the components, the instability (I), the abstractions (A), and the distance (D) from this point (I, A) to the main sequence
 
-Check the `tests.stubs.stub_project_a` component, this has an abstraction and an instability of 1, which means that this component is unuseful. If you check in the project this is a Python package, and there is nothing in the ``__init__.py``. 
+Check the `tests/stubs/stub_project_a/__init__.py` component, this has an abstraction and an instability of 1, which means that this component is unuseful. If you check in the project this is a Python package, and there is nothing in the ``__init__.py``. 
 
 Also, you can ignore some dependencies throughout the software evaluation.
 To do this use the `--ignore-dependencies` argument.
 
 ```
- python -m basel report --path tests/stubs/stub_project_a --ignore-dependencies="tests.stubs.stub_project_a.package_a.module_a1"
+basel report --path tests/stubs/stub_project_a --ignore-dependencies="tests/stubs/stub_project_a/package_a/module_a1.py"
 ```
 You can see something like that
 ```
-Component                                         I     A     D
-----------------------------------------------  ---  ----  ----
-tests.stubs.stub_project_a                        1  1     1
-tests.stubs.stub_project_a.module_1               1  0.33  0.33
-tests.stubs.stub_project_a.package_b.module_b3    1  1     1
-tests.stubs.stub_project_a.package_b.module_b1    0  0.5   0.5
-tests.stubs.stub_project_a.package_b              1  1     1
-tests.stubs.stub_project_a.package_b.module_b2    1  0.5   0.5
-tests.stubs.stub_project_a.package_a.module_a2    0  0.5   0.5
-tests.stubs.stub_project_a.package_a.module_a1    1  1     1
-tests.stubs.stub_project_a.package_a              1  1     1
-Mean Distance: 0.76
+Component                                            I    A    D
+-------------------------------------------------  ---  ---  ---
+tests/stubs/stub_project_a/__init__.py               1  1    1
+tests/stubs/stub_project_a/module_1.py               1  0    0
+tests/stubs/stub_project_a/package_b/module_b3.py    1  1    1
+tests/stubs/stub_project_a/package_b/module_b1.py    0  0    1
+tests/stubs/stub_project_a/package_b/__init__.py     1  1    1
+tests/stubs/stub_project_a/package_b/module_b2.py    1  0    0
+tests/stubs/stub_project_a/package_a/module_a2.py    0  0.5  0.5
+tests/stubs/stub_project_a/package_a/module_a1.py    1  1    1
+tests/stubs/stub_project_a/package_a/__init__.py     1  1    1
+Mean Distance: 0.72
 ```
 
-We are ignoring the `tests.stubs.stub_project_a.package_a.module_a1` component.  If you note, in the above command output this module had an abstraction of 1 and instability of 0.25 and right now has 1 to both metrics. So, we are isolation this component from the rest of the architecture. This is useful when you can ignore the incoming dependencies of a specific module and evaluate the project stability with the rest of the components, e.x Evaluate the domain and infrastructure layers independently.
+We are ignoring the `tests/stubs/stub_project_a/package_a/module_a1.py` component.  If you note, in the above command output this module had an abstraction of 1 and instability of 0.25 and right now has 1 to both metrics. So, we are isolation this component from the rest of the architecture. This is useful when you can ignore the incoming dependencies of a specific module and evaluate the project stability with the rest of the components, e.x Evaluate the domain and infrastructure layers independently.
