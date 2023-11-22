@@ -24,7 +24,7 @@ jobs:
         run: ls ${{ github.workspace }}
       
       - name: Install Dependencies
-        run: poetry 
+        run: poetry install
 
       - name: Run Pre-Commit
         run: poetry run pre-commit run --all-files
