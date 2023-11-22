@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import List
 
+from basel.components import ModuleComponent
+from basel.components import ModuleComponentLoader
 import pytest
-
-from src.components import ModuleComponent
-from src.components import ModuleComponentLoader
 
 root_stub_project = Path("tests/stubs/stub_project")
 
@@ -17,6 +16,7 @@ root_stub_project = Path("tests/stubs/stub_project")
             [
                 root_stub_project / Path("__init__.py"),
                 root_stub_project / Path("module_1.py"),
+                root_stub_project / Path("package_b/module_b1.py"),
                 root_stub_project / Path("package_a/module_a2.py"),
                 root_stub_project / Path("package_a/module_a1.py"),
                 root_stub_project / Path("package_a/__init__.py"),
@@ -32,38 +32,89 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
 
 
 @pytest.mark.parametrize(
-    "root_module,expected_components",
+    "root_module,expected_components,exclude_components,exclude_packages",
     [
         (
             root_stub_project,
             [
                 ModuleComponent(
                     path=root_stub_project / Path("__init__.py"),
-                    name="tests.stubs.stub_project",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("module_1.py"),
-                    name="tests.stubs.stub_project.module_1",
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a2.py"),
-                    name="tests.stubs.stub_project.package_a.module_a2",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/module_a1.py"),
-                    name="tests.stubs.stub_project.package_a.module_a1",
                 ),
                 ModuleComponent(
                     path=root_stub_project / Path("package_a/__init__.py"),
                     name="tests.stubs.stub_project.package_a",
                 ),
             ],
+            None,
+            False,
+        ),
+        (
+            root_stub_project,
+            [
+                ModuleComponent(
+                    path=root_stub_project / Path("module_1.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/module_a2.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/module_a1.py"),
+                ),
+            ],
+            None,
+            True,
+        ),
+        (
+            root_stub_project,
+            [
+                ModuleComponent(
+                    path=root_stub_project / Path("module_1.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_b/module_b1.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/module_a1.py"),
+                ),
+                ModuleComponent(
+                    path=root_stub_project / Path("package_a/__init__.py"),
+                ),
+            ],
+            [
+                "tests/stubs/stub_project/__init__.py",
+                "tests/stubs/stub_project/package_a/module_a2.py",
+            ],
+            False,
         ),
     ],
 )
-def test_load_components(root_module: Path, expected_components: List[ModuleComponent]):
+def test_load_components(
+    root_module: Path,
+    expected_components: List[ModuleComponent],
+    exclude_components: List[str],
+    exclude_packages: bool,
+):
     loader = ModuleComponentLoader()
-    loader.load_components(root_module)
+    loader.load_components(
+        root_module,
+        exclude_components=exclude_components,
+        exclude_packages=exclude_packages,
+    )
 
     components = loader.get_components()
     for component, expected_component in zip(components, expected_components):

@@ -1,6 +1,6 @@
 import abc
 
-from src.dtos import Report
+from basel.dtos import Report
 from tabulate import tabulate
 
 

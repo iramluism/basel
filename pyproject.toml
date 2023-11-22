@@ -4,10 +4,18 @@ version = "0.1.0"
 description = ""
 authors = ["Iram Luis Morales Santos <iramluism@gmail.com>", "Maura Elena Diaz Boente <mdboente@gmail.com>"]
 readme = "README.md"
+keywords = ["report"]
+
+[project.urls]
+Repository = "https://github.com/iramluism/basel.git"
+Issues = "https://github.com/iramluism/basel/issues"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 tabulate = "^0.9.0"
+
+[tool.poetry.scripts]
+basel = "basel.main:main"
 
 
 [tool.poetry.group.dev.dependencies]
