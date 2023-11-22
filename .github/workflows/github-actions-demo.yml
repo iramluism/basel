@@ -5,6 +5,8 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
+      - name: Intall Poetry
+        run: pipx install poetry==1.2.0
       - name: Install Dependencies
         run: poetry install
       - name: Run Tests
