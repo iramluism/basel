@@ -108,8 +108,8 @@ class ModuleComponent(Component):
         return _imports
 
     def get_dependencies(self):
-        with open(self.path, "r") as archivo:
-            tree_imports = ast.parse(archivo.read())
+        with open(self.path, "r") as file_handler:
+            tree_imports = ast.parse(file_handler.read())
 
         _imports = set()
         for node in ast.walk(tree_imports):
@@ -163,12 +163,12 @@ class ModuleComponentLoader(ComponentLoader):
             component.load_classes()
 
     def _load_dependencies(self, ignore_dependencies: Optional[List[str]] = None):
-        
+
         if not ignore_dependencies:
             ignore_dependencies = []
-        
+
         ignore_dependencies += self.ignore_dependencies
-        
+
         for component_name, component in self.components.items():
             component.load_dependencies(ignore_dependencies=ignore_dependencies)
             self.components[component_name] = component
