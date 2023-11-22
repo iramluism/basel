@@ -1,15 +1,21 @@
 import argparse
 from pathlib import Path
 
-from src import config
-from src.client import Basel
-from src.components import ModuleComponentLoader
-from src.views import ConsoleView
+from basel import config
+from basel.client import Basel
+from basel.components import ModuleComponentLoader
+from basel.views import ConsoleView
 
 COMMANDS = {
     "report": {
         "method": "report",
-        "args": [("path", "root_path"), ("ignore_dependencies", "ignore_dependencies")],
+        "args": [
+            ("path", "root_path"),
+            ("ignore_dependencies", "ignore_dependencies"),
+            ("exclude", "exclude_components"),
+            ("no-packages", "exclude_packages"),
+            ("filter", "filter_by_components"),
+        ],
     }
 }
 
@@ -38,7 +44,23 @@ def main():
 
     parser.add_argument("command", choices=["report"])
     parser.add_argument("--path", required=True, type=Path)
-    parser.add_argument("--ignore-dependencies", type=cast_list_string)
+    parser.add_argument(
+        "--ignore-dependencies",
+        type=cast_list_string,
+        help="Remove dependencies (modules, external libreries)",
+    )
+    parser.add_argument(
+        "--exclude",
+        type=cast_list_string,
+        help="Exclude components from report",
+    )
+    parser.add_argument(
+        "--no-packages", action="store_true", help="Exculde all python package"
+    )
+
+    parser.add_argument(
+        "-f", "--filter", help="Filter Report by Components", type=cast_list_string
+    )
 
     _args = parser.parse_args()
 

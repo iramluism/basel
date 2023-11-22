@@ -4,7 +4,7 @@ from typing import List
 from typing import NoReturn
 from typing import Optional
 
-from src.dtos import ASPoint
+from basel.dtos import ASPoint
 
 
 class Component(metaclass=abc.ABCMeta):
@@ -106,7 +106,7 @@ class ComponentLoader(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_as_plane(self) -> Dict[str, ASPoint]:
+    def get_as_plane(self, *args, **kwargs) -> Dict[str, ASPoint]:
         raise NotImplementedError()
 
     @abc.abstractmethod
