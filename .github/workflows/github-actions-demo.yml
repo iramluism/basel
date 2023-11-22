@@ -27,7 +27,7 @@ jobs:
         run: poetry 
 
       - name: Run Pre-Commit
-        uses: poetry run pre-commit run --all-files
+        run: poetry run pre-commit run --all-files
 
       - name: Run Tests
         env:
