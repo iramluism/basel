@@ -26,12 +26,8 @@ class Basel:
         self.view = view
 
     def _format_report_data(self, data: Dict[str, ASPoint]) -> List[Any]:
-        formatted_data = []
-
-        for label, point in data.items():
-            formatted_data.append((label, point.x, point.y, point.d))
-
-        return formatted_data
+        return [(label, point.x, point.y, point.d)
+                for label, point in data.items()]
 
     def report(self, root_path: Path, ignore_dependencies: Optional[List[str]] = None):
         self.loader.load_components(root_path, ignore_dependencies)
