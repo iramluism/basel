@@ -29,6 +29,7 @@ autoflake = "^2.2.1"
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.3"
 coverage = "^7.3.2"
+pytest-github-report = "^0.0.1"
 
 
 [build-system]
