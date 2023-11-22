@@ -35,11 +35,13 @@ jobs:
           pytest_report_title: "Basel Test Result"
         run: poetry run coverage run -m pytest -vv
 
+      - run: echo "TEST_COVERAGE_TOTAL=$(poetry run coverage --format==total)" >> $GITHUB_ENV
+
       - name: Print test coverage report
         run: poetry run coverage report
 
       - name: Check Tests Coverage Percent
-        if: $(poetry run coverage report --format=total) < 80
+        if: ${{TEST_COVERAGE_TOTAL}} < 80
         uses: actions/github-script@v3
         with:
           script: |
