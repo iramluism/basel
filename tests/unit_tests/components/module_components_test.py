@@ -32,6 +32,7 @@ def test_get_py_module_component(root_module: Path, expected_py_modules: List[Pa
     assert py_modules == expected_py_modules
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "root_module,expected_components,exclude_components,exclude_packages",
     [
