@@ -26,8 +26,7 @@ class Basel:
         self.view = view
 
     def _format_report_data(self, data: Dict[str, ASPoint]) -> List[Any]:
-        return [(label, point.x, point.y, point.d)
-                for label, point in data.items()]
+        return [(label, point.x, point.y, point.d) for label, point in data.items()]
 
     def report(
         self,
