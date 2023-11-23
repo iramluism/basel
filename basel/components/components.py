@@ -29,11 +29,17 @@ class Component(metaclass=abc.ABCMeta):
             yield node
 
     def __eq__(self, component):
+        if not component:
+            return False
+
         equal_names = self.name == component.name
 
-        for other_node in component.nodes:
-            self_node = self.get_node(other_node)
-            if not self_node:
+        for other_node in component:
+            self_node = self.get_node(other_node.name)
+            if other_node != self_node:
                 return False
 
         return equal_names
+
+    def __ne__(self, component):
+        return not self.__eq__(component)

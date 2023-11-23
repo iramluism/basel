@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 from basel.components import Component
+from basel.components.classes import ClassNode
 from basel.components.links import Link
 from basel.components.modules import ModuleNode
 from basel.loaders.modules import ModuleLoader
@@ -156,3 +157,49 @@ def test_search_by_module(root, _import, expected_py_module):
     os.chdir(cwd)
 
     assert py_module == expected_py_module
+
+
+@pytest.mark.parametrize(
+    "components,_classes,expected_components",
+    [
+        (
+            (
+                Component(name="Component_A", nodes=[ModuleNode("Module_A")]),
+                Component(name="Component_B", nodes=[ModuleNode("Module_B")]),
+            ),
+            {
+                "Module_A": [("ClassA", [], {})],
+                "Module_B": [("ClassB", ["ClassA"], {})],
+            },
+            [
+                Component(
+                    name="Component_A",
+                    nodes=[ModuleNode("Module_A", children=[ClassNode("ClassA")])],
+                ),
+                Component(
+                    name="Component_B",
+                    nodes=[
+                        ModuleNode(
+                            "Module_B", children=[ClassNode("ClassB", ["ClassA"])]
+                        )
+                    ],
+                ),
+            ],
+        )
+    ],
+)
+def test_load_classes(components, _classes, expected_components):
+    mock_parser = Mock(spec=Parser)
+
+    def mock_get_parsed_classes(module):
+        return _classes.get(module)
+
+    mock_parser.get_classes.side_effect = mock_get_parsed_classes
+
+    loader = ModuleLoader(mock_parser, components)
+
+    loader.load_classes()
+
+    components = loader.get_components()
+
+    assert components == expected_components

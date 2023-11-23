@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 from basel.components import Component
+from basel.components.classes import ClassNode
 from basel.components.modules import ModuleNode
 from basel.loaders import Loader
 
@@ -47,6 +48,17 @@ class ModuleLoader(Loader):
             module = self._get_local_py_module(_import)
             if module:
                 return module
+
+    def _load_classes_for_node(self, node):
+        _classes = self.parser.get_classes(node.name)
+        for _class in _classes:
+            class_node = ClassNode(*_class)
+            node.add_child(class_node)
+
+    def load_classes(self):
+        for comp_name, comp in self.components.items():
+            for node in comp:
+                self._load_classes_for_node(node)
 
     def _get_local_py_module(self, _import: str):
         py_module = self._format_to_py_module_path(_import)
