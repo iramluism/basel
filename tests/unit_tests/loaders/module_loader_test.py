@@ -203,3 +203,80 @@ def test_load_classes(components, _classes, expected_components):
     components = loader.get_components()
 
     assert components == expected_components
+
+
+@pytest.mark.parametrize(
+    "components,links,expected_instability",
+    [
+        (
+            #
+            #     A
+            #    / \
+            #   *   *
+            #   B   C
+            #   \   /
+            #    * *
+            #     C
+            [
+                Component(name="component_A"),
+                Component(name="component_B"),
+                Component(name="component_C"),
+                Component(name="component_D"),
+            ],
+            [
+                Link(Component(name="component_A"), Component(name="component_B")),
+                Link(Component(name="component_A"), Component(name="component_C")),
+                Link(Component(name="component_B"), Component(name="component_D")),
+                Link(Component(name="component_C"), Component(name="component_D")),
+            ],
+            {
+                "component_A": 1,
+                "component_B": 0.5,
+                "component_C": 0.5,
+                "component_D": 0,
+            },
+        ),
+        (
+            # A --* B
+            # C Isolated Component
+            [
+                Component(name="component_A"),
+                Component(name="component_B"),
+                Component(name="component_C"),
+            ],
+            [
+                Link(Component(name="component_A"), Component(name="component_B")),
+            ],
+            {
+                "component_A": 1,
+                "component_B": 0,
+                "component_C": 1,
+            },
+        ),
+        (
+            # A *--* B Circular Dependency
+            [
+                Component(name="component_A"),
+                Component(name="component_B"),
+            ],
+            [
+                Link(Component(name="component_A"), Component(name="component_B")),
+                Link(Component(name="component_B"), Component(name="component_A")),
+            ],
+            {
+                "component_A": 0.5,
+                "component_B": 0.5,
+            },
+        ),
+    ],
+)
+def test_calculate_instability(components, links, expected_instability):
+    mock_parser = Mock(spec=Parser)
+
+    loader = ModuleLoader(mock_parser, components, links)
+
+    loader.calculate_instability()
+
+    for comp_name, instability in expected_instability.items():
+        comp = loader.get_component(comp_name)
+        assert comp.instability == instability

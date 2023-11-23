@@ -8,9 +8,14 @@ class Component(metaclass=abc.ABCMeta):
     def __init__(self, name: str, nodes: List[Node] = None) -> None:
         self.name = name
         self.nodes = {}
+        self.instability = 1
+        self.abstraction = 1
 
         for node in nodes or []:
             self.add_node(node)
+
+    def set_instability(self, instability):
+        self.instability = instability
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"

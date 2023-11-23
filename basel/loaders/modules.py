@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import List
 
+from basel import utils
 from basel.components import Component
 from basel.components.classes import ClassNode
 from basel.components.modules import ModuleNode
@@ -59,6 +60,23 @@ class ModuleLoader(Loader):
         for comp_name, comp in self.components.items():
             for node in comp:
                 self._load_classes_for_node(node)
+
+    def _get_input_and_output_deps_of_component(self, component):
+        input_deps = output_deps = 0
+
+        for link in self.links:
+            if link.source.name == component.name:
+                output_deps += 1
+            elif link.target.name == component.name:
+                input_deps += 1
+
+        return input_deps, output_deps
+
+    def calculate_instability(self):
+        for comp in self.components.values():
+            input_deps, output_deps = self._get_input_and_output_deps_of_component(comp)
+            comp_instability = utils.instability(input_deps, output_deps)
+            comp.set_instability(comp_instability)
 
     def _get_local_py_module(self, _import: str):
         py_module = self._format_to_py_module_path(_import)
