@@ -1,6 +1,7 @@
 import abc
 from typing import List
 
+from basel.components.classes import ClassNode
 from basel.components.nodes import Node
 
 
@@ -16,6 +17,27 @@ class Component(metaclass=abc.ABCMeta):
 
     def set_instability(self, instability):
         self.instability = instability
+
+    def set_abstraction(self, abstraction):
+        self.abstraction = abstraction
+
+    def get_classes(self):
+        classes = []
+        nodes = list(self.nodes.values())
+
+        while nodes:
+            node = nodes.pop(0)
+
+            if not node:
+                break
+
+            children = node.get_children()
+            nodes.extend(children)
+
+            if isinstance(node, ClassNode):
+                classes.append(node)
+
+        return classes
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"

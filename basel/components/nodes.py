@@ -9,6 +9,9 @@ class Node:
     def add_child(self, node):
         self.children[node.name] = node
 
+    def get_children(self):
+        return list(self.children.values())
+
     def get_child(self, node_name):
         return self.children.get(node_name)
 
