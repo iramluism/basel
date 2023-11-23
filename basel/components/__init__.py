@@ -1,3 +1,3 @@
 from basel.components.components import Component
 
-__all__ = [Component]
+__all__ = ["Component"]

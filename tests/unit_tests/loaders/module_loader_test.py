@@ -35,6 +35,14 @@ STUB_PROJECT_1_PATH = Path("tests/stubs/project_1")
                     ],
                 ),
                 Component(
+                    name=str(STUB_PROJECT_1_PATH / "package_b/__init__.py"),
+                    nodes=[
+                        ModuleNode(
+                            str(STUB_PROJECT_1_PATH / "package_b/__init__.py"),
+                        )
+                    ],
+                ),
+                Component(
                     name=str(STUB_PROJECT_1_PATH / "package_a/module_a1.py"),
                     nodes=[
                         ModuleNode(
