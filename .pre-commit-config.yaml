@@ -30,3 +30,9 @@ repos:
     files: "basel|tests"
     language: system
     entry: flake8 --config setup.cfg
+
+  - id: tests
+    name: "Run Tests"
+    stages: [pre-push]
+    language: system
+    entry: pytest . -vv
