@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -98,13 +99,46 @@ def test_load_links(components, _imports, expected_links):
 
     loader = ModuleLoader(mock_parser, components)
 
-    def mock_get_local_py_module(_import):
+    def mock_search_py_module(_import):
         return _import
 
-    loader._get_local_py_module = mock_get_local_py_module
+    loader.search_py_module = mock_search_py_module
 
     loader.load_links()
 
     links = loader.get_links()
 
     assert links == expected_links
+
+
+@pytest.mark.parametrize(
+    "root,_import,expected_py_module",
+    [
+        (
+            STUB_PROJECT_1_PATH,
+            "package_a.module_a1",
+            Path("package_a/module_a1.py"),
+        ),
+        (
+            STUB_PROJECT_1_PATH,
+            "package_a.module_a1.ConcretClass",
+            Path("package_a/module_a1.py"),
+        ),
+        (STUB_PROJECT_1_PATH, "package_a", Path("package_a")),
+        (STUB_PROJECT_1_PATH, "package_b", Path("package_b/__init__.py")),
+        (STUB_PROJECT_1_PATH, "dataclasses.dataclass", None),
+    ],
+)
+def test_search_by_module(root, _import, expected_py_module):
+    cwd = os.getcwd()
+    os.chdir(root)
+
+    mock_parser = Mock(spec=Parser)
+
+    loader = ModuleLoader(mock_parser)
+
+    py_module = loader.search_py_module(_import)
+
+    os.chdir(cwd)
+
+    assert py_module == expected_py_module

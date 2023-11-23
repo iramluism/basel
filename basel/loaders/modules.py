@@ -16,9 +16,9 @@ class ModuleLoader(Loader):
         for comp_name, comp in self.components.items():
             comp_imports = self.parser.get_imports(comp_name)
             for _import in comp_imports:
-                module_path = self._get_local_py_module(_import)
+                module_path = self.search_py_module(_import)
 
-                link_to_comp = self.get_component(module_path)
+                link_to_comp = self.get_component(str(module_path))
                 if link_to_comp:
                     self.link_component(comp, link_to_comp)
 
@@ -28,7 +28,16 @@ class ModuleLoader(Loader):
     def _format_to_py_package_path(self, _import: str):
         return Path(_import.replace(".", "/")) / "__init__.py"
 
-    def _get_local_py_module(self, _import):
+    def search_py_module(self, _import: str):
+        _parent_import = ".".join(_import.split(".")[:-1])
+        search_attemps = [_import, _parent_import]
+
+        for _import in search_attemps:
+            module = self._get_local_py_module(_import)
+            if module:
+                return module
+
+    def _get_local_py_module(self, _import: str):
         py_module = self._format_to_py_module_path(_import)
         if os.path.exists(py_module):
             return py_module
