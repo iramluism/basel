@@ -7,7 +7,7 @@ def instability(in_deps: float, out_deps: float) -> float:
 
 
 def stability(in_deps: float, out_deps: float) -> float:
-    return 1 - instability(out_deps, in_deps)
+    return round(1 - instability(in_deps, out_deps), 2)
 
 
 def abstraction(abs_classes: float, imp_classes: float) -> float:
@@ -19,4 +19,4 @@ def abstraction(abs_classes: float, imp_classes: float) -> float:
 
 
 def implementation(abs_classes: float, imp_classes: float) -> float:
-    return 1 - abstraction(abs_classes, imp_classes)
+    return round(1 - abstraction(abs_classes, imp_classes), 2)
