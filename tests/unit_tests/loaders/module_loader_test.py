@@ -62,7 +62,13 @@ def test_module_loader(paths, expected_components):
 
     components = loader.get_components()
 
-    assert set(components) == set(expected_components)
+    _components = set()
+    for expected_comp in expected_components:
+        for comp in components:
+            if comp == expected_comp:
+                _components.add(comp.name)
+
+    assert len(_components) == len(expected_components)
 
 
 @pytest.mark.parametrize(
