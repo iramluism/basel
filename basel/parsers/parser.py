@@ -15,3 +15,7 @@ class Parser(metaclass=abc.ABCMeta):
         """
 
         raise NotImplementedError()
+
+    @abc.abstractclassmethod
+    def is_abstract_class(self, class_name, subclassess, keywords):
+        raise NotADirectoryError()

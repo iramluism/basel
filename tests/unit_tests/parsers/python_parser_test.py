@@ -49,3 +49,24 @@ def test_get_classess(path, expected_classess):
     _classes = parser.get_classes(path)
 
     assert _classes == expected_classess
+
+
+@pytest.mark.parametrize(
+    "_class,expected_abstract_result",
+    [
+        (("ClassA", ["ABC"], {}), True),
+        (("ClassB", [], {"metaclass": "ABC"}), True),
+        (("ClassC", [], {"metaclass": "ABCMeta"}), True),
+        (("ClassD", [], {"metaclass": "abc.ABCMeta"}), True),
+        (("ClassE", ["ABCMeta"], {}), False),
+        (("ClassF", ["BaseModule", "ClassA", "ABC"], {}), True),
+        (("ClassG", ["BaseModule", "ClassA"], {"metaclass": "ABC"}), True),
+        (("ClassH", ["BaseModule", "ClassA"], {"metaclass": "ABCMeta"}), True),
+        (("ClassI", ["BaseModule", "ClassA"], {}), False),
+        (("ClassJ", [], {}), False),
+    ],
+)
+def test_is_abstract_class(_class, expected_abstract_result):
+    parser = PythonParser()
+    is_abstract = parser.is_abstract_class(*_class)
+    assert is_abstract == expected_abstract_result

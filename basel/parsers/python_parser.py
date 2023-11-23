@@ -51,3 +51,13 @@ class PythonParser(Parser):
                 _classes.append(_class)
 
         return _classes
+
+    def is_abstract_class(self, class_name, subclassess, keywords):
+        if "ABC" in subclassess:
+            return True
+
+        metaclass = keywords.get("metaclass")
+        if metaclass in ["ABC", "abc.ABCMeta", "ABCMeta"]:
+            return True
+
+        return False
