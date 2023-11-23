@@ -33,6 +33,8 @@ repos:
 
   - id: tests
     name: "Run Tests"
-    stages: [pre-push]
+    files: "basel|tests"
+    stages: [push, pre-push]
     language: system
-    entry: pytest . -vv
+    entry: bash "pyests -vv"
+    always_run: true
