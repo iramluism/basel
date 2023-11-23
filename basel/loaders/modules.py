@@ -12,15 +12,19 @@ class ModuleLoader(Loader):
         modules = self._discover_modules(paths)
         self.add_modules(modules)
 
+    def _search_linked_component(self, module_path):
+        for comp in self.components.values():
+            if comp.has_node(module_path):
+                return comp
+
     def load_links(self):
         for comp_name, comp in self.components.items():
             comp_imports = self.parser.get_imports(comp_name)
             for _import in comp_imports:
                 module_path = self.search_py_module(_import)
-
-                link_to_comp = self.get_component(str(module_path))
-                if link_to_comp:
-                    self.link_component(comp, link_to_comp)
+                linked_component = self._search_linked_component(str(module_path))
+                if linked_component:
+                    self.link_component(comp, linked_component)
 
     def _format_to_py_module_path(self, _import: str):
         return Path(_import.replace(".", "/") + ".py")

@@ -12,6 +12,12 @@ class Component(metaclass=abc.ABCMeta):
         for node in nodes or []:
             self.add_node(node)
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name}>"
+
+    def has_node(self, node_name):
+        return node_name in self.nodes
+
     def add_node(self, node: Node):
         self.nodes[node.name] = node
 

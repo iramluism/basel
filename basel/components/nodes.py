@@ -11,3 +11,6 @@ class Node:
 
     def remove_child(self, node_name):
         self.children.pop(node_name)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name}>"

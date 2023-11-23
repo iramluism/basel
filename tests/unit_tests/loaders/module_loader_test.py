@@ -84,10 +84,10 @@ def test_module_loader(paths, expected_components):
             #    * *
             #     C
             [
-                Component(name="component_A"),
-                Component(name="component_B"),
-                Component(name="component_C"),
-                Component(name="component_D"),
+                Component(name="component_A", nodes=[ModuleNode("component_A")]),
+                Component(name="component_B", nodes=[ModuleNode("component_B")]),
+                Component(name="component_C", nodes=[ModuleNode("component_C")]),
+                Component(name="component_D", nodes=[ModuleNode("component_D")]),
             ],
             {
                 "component_A": ["component_B", "component_C"],
