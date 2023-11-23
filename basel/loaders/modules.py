@@ -12,6 +12,34 @@ class ModuleLoader(Loader):
         modules = self._discover_modules(paths)
         self.add_modules(modules)
 
+    def load_links(self):
+        for comp_name, comp in self.components.items():
+            comp_imports = self.parser.get_imports(comp_name)
+            for _import in comp_imports:
+                module_path = self._get_local_py_module(_import)
+
+                link_to_comp = self.get_component(module_path)
+                if link_to_comp:
+                    self.link_component(comp, link_to_comp)
+
+    def _format_to_py_module_path(self, _import: str):
+        return Path(_import.replace(".", "/") + ".py")
+
+    def _format_to_py_package_path(self, _import: str):
+        return Path(_import.replace(".", "/")) / "__init__.py"
+
+    def _get_local_py_module(self, _import):
+        py_module = self._format_to_py_module_path(_import)
+        if os.path.exists(py_module):
+            return py_module
+
+        py_package = self._format_to_py_package_path(_import)
+        if os.path.exists(py_package):
+            return py_package
+
+        if os.path.isdir(py_package.parent):
+            return py_package.parent
+
     def add_modules(self, modules: List[Path]):
         for module_path in modules:
             module_name = str(module_path)

@@ -8,7 +8,7 @@ class Parser(metaclass=abc.ABCMeta):
         raise NotADirectoryError()
 
     @abc.abstractmethod
-    def get_classes(self, path) -> List[str, list, dict]:
+    def get_classes(self, path) -> List:
         """Parser all classes in the script
         :param path: sript path
         return: List["ClassName", ["Interfaces"], "attributes"]

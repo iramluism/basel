@@ -5,7 +5,7 @@ from basel.components.nodes import Node
 
 
 class Component(metaclass=abc.ABCMeta):
-    def __init__(self, name: str, nodes: List[Node]) -> None:
+    def __init__(self, name: str, nodes: List[Node] = None) -> None:
         self.name = name
         self.nodes = {}
 
