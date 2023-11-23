@@ -3,10 +3,14 @@ from typing import List
 from typing import Optional
 
 from basel.components import Component
+from basel.parsers.parser import Parser
 
 
 class Loader(metaclass=abc.ABCMeta):
-    def __init__(self, components: Optional[List[Component]] = None) -> None:
+    def __init__(
+        self, parser: Parser, components: Optional[List[Component]] = None
+    ) -> None:
+        self.parser = parser
         self.components = components or {}
 
     @abc.abstractmethod
