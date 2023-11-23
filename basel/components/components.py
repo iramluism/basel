@@ -24,6 +24,10 @@ class Component(metaclass=abc.ABCMeta):
     def get_node(self, node_name):
         return self.nodes.get(node_name)
 
+    def __iter__(self):
+        for node in self.nodes.values():
+            yield node
+
     def __eq__(self, component):
         equal_names = self.name == component.name
 

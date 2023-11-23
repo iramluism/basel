@@ -17,9 +17,16 @@ class ModuleLoader(Loader):
             if comp.has_node(module_path):
                 return comp
 
+    def _get_imports_from_component_nodes(self, component):
+        _imports = []
+        for node in component:
+            _imports.extend(self.parser.get_imports(node.name))
+
+        return _imports
+
     def load_links(self):
         for comp_name, comp in self.components.items():
-            comp_imports = self.parser.get_imports(comp_name)
+            comp_imports = self._get_imports_from_component_nodes(comp)
             for _import in comp_imports:
                 module_path = self.search_py_module(_import)
                 linked_component = self._search_linked_component(str(module_path))
