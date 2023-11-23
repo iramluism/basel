@@ -280,3 +280,72 @@ def test_calculate_instability(components, links, expected_instability):
     for comp_name, instability in expected_instability.items():
         comp = loader.get_component(comp_name)
         assert comp.instability == instability
+
+
+@pytest.mark.parametrize(
+    "components,expected_abstraction",
+    [
+        (
+            [
+                Component(
+                    name="ComponentA",
+                    nodes=[
+                        ModuleNode(
+                            name="ModuleA",
+                            children=[
+                                ClassNode(name="AbstractClassA"),
+                                ClassNode(name="ClassB"),
+                            ],
+                        )
+                    ],
+                ),
+                Component(
+                    name="ComponentB",
+                    nodes=[
+                        ModuleNode(
+                            name="ModuleB",
+                            children=[
+                                ClassNode(name="ClassB"),
+                                ClassNode(name="ClassB2"),
+                            ],
+                        )
+                    ],
+                ),
+                Component(
+                    name="ComponentC",
+                    nodes=[
+                        ModuleNode(
+                            name="ModuleC",
+                            children=[
+                                ClassNode(name="AbstractClassC"),
+                                ClassNode(name="AbstractClassC2"),
+                            ],
+                        )
+                    ],
+                ),
+                Component(name="ComponentD"),
+            ],
+            {
+                "ComponentA": 0.5,
+                "ComponentB": 0,
+                "ComponentC": 1,
+                "ComponentD": 1,
+            },
+        )
+    ],
+)
+def test_calculate_abstraction(components, expected_abstraction):
+    mock_parser = Mock(spec=Parser)
+
+    def mock_is_abstract_class(class_name, subclasses, keywords):
+        return class_name.startswith("Abstract")
+
+    mock_parser.is_abstract_class.side_effect = mock_is_abstract_class
+
+    loader = ModuleLoader(mock_parser, components)
+
+    loader.calculate_abstraction()
+
+    for comp_name, abstraction in expected_abstraction.items():
+        comp = loader.get_component(comp_name)
+        assert comp.abstraction == abstraction

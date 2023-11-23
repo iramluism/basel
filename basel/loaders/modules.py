@@ -78,6 +78,30 @@ class ModuleLoader(Loader):
             comp_instability = utils.instability(input_deps, output_deps)
             comp.set_instability(comp_instability)
 
+    def _get_abs_and_imp_classes_of_comp(self, comp):
+        abstract_classes = implementation_classes = 0
+        _classes = comp.get_classes()
+
+        for _class in _classes:
+            is_abstract_class = self.parser.is_abstract_class(
+                class_name=_class.name,
+                subclasses=_class.subclasses,
+                keywords=_class.keywords,
+            )
+
+            if is_abstract_class:
+                abstract_classes += 1
+            else:
+                implementation_classes += 1
+
+        return abstract_classes, implementation_classes
+
+    def calculate_abstraction(self):
+        for comp in self.components.values():
+            abs_classes, imp_classes = self._get_abs_and_imp_classes_of_comp(comp)
+            comp_abstraction = utils.abstraction(abs_classes, imp_classes)
+            comp.set_abstraction(comp_abstraction)
+
     def _get_local_py_module(self, _import: str):
         py_module = self._format_to_py_module_path(_import)
         if os.path.exists(py_module):
