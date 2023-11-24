@@ -64,12 +64,13 @@ def main():
         help="Remove dependencies (modules, external libreries)",
     )
     parser.add_argument(
+        "-e",
         "--exclude",
         type=cast_list_string,
         help="Exclude components from report",
     )
     parser.add_argument(
-        "--no-packages", action="store_true", help="Exculde all python package"
+        "-np", "--no-packages", action="store_true", help="Exculde all python package"
     )
 
     parser.add_argument(
