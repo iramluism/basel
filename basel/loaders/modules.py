@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import List
+from typing import Optional
 
 from basel import utils
 from basel.components import Component
@@ -10,7 +11,13 @@ from basel.loaders import Loader
 
 
 class ModuleLoader(Loader):
-    def load_components(self, paths: List[str]):
+    def load_components(
+        self,
+        paths: List[str],
+        ignore_dependencies: Optional[List[str]] = None,
+        exclude_components: Optional[List[str]] = None,
+        exclude_packages: Optional[List[str]] = None,
+    ):
         modules = self._discover_modules(paths)
         self.add_modules(modules)
 
@@ -78,6 +85,7 @@ class ModuleLoader(Loader):
             comp.set_error(error)
 
     def calculate_instability(self):
+        self.load_links()
         for comp in self.components.values():
             input_deps, output_deps = self._get_input_and_output_deps_of_component(comp)
             comp_instability = utils.instability(input_deps, output_deps)
@@ -102,6 +110,7 @@ class ModuleLoader(Loader):
         return abstract_classes, implementation_classes
 
     def calculate_abstraction(self):
+        self.load_classes()
         for comp in self.components.values():
             abs_classes, imp_classes = self._get_abs_and_imp_classes_of_comp(comp)
             comp_abstraction = utils.abstraction(abs_classes, imp_classes)

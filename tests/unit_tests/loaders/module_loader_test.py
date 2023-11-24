@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from unittest.mock import MagicMock
 from unittest.mock import Mock
 
 from basel.components import Component
@@ -274,9 +275,11 @@ def test_calculate_instability(components, links, expected_instability):
     mock_parser = Mock(spec=Parser)
 
     loader = ModuleLoader(mock_parser, components, links)
+    loader.load_links = MagicMock()
 
     loader.calculate_instability()
 
+    loader.load_links.assert_called_once()
     for comp_name, instability in expected_instability.items():
         comp = loader.get_component(comp_name)
         assert comp.instability == instability
@@ -343,9 +346,11 @@ def test_calculate_abstraction(components, expected_abstraction):
     mock_parser.is_abstract_class.side_effect = mock_is_abstract_class
 
     loader = ModuleLoader(mock_parser, components)
+    loader.load_classes = MagicMock()
 
     loader.calculate_abstraction()
 
+    loader.load_classes.assert_called_once()
     for comp_name, abstraction in expected_abstraction.items():
         comp = loader.get_component(comp_name)
         assert comp.abstraction == abstraction
