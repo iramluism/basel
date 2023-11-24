@@ -1,19 +1,31 @@
 import abc
 from typing import List
+from typing import Optional
 
 from basel.components.classes import ClassNode
 from basel.components.nodes import Node
 
 
 class Component(metaclass=abc.ABCMeta):
-    def __init__(self, name: str, nodes: List[Node] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        nodes: List[Node] = None,
+        instability: Optional[float] = 1,
+        abstraction: Optional[float] = 1,
+        error: Optional[float] = 1,
+    ) -> None:
         self.name = name
         self.nodes = {}
-        self.instability = 1
-        self.abstraction = 1
+        self.instability = instability
+        self.abstraction = abstraction
+        self.error = error
 
         for node in nodes or []:
             self.add_node(node)
+
+    def set_error(self, error):
+        self.error = error
 
     def set_instability(self, instability):
         self.instability = instability
