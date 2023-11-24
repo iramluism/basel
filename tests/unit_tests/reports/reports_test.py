@@ -9,21 +9,20 @@ import pytest
 MockComponent = Mock(spec=Component)
 
 
+MOCK_COMPONENTS_LIST = [
+    Component(name="Component_A", instability=1, abstraction=1, error=1),
+    Component(name="Component_B", instability=0, abstraction=1, error=0),
+    Component(name="Component_C", instability=0.25, abstraction=0.5, error=0.25),
+    Component(name="Component_D", instability=0.7, abstraction=0, error=0.7),
+    Component(name="Component_E", instability=0, abstraction=0, error=1),
+]
+
+
 @pytest.mark.parametrize(
-    "components,expected_report",
+    "components,expected_report,filters",
     [
         (
-            [
-                Component(name="Component_A", instability=1, abstraction=1, error=1),
-                Component(name="Component_B", instability=0, abstraction=1, error=0),
-                Component(
-                    name="Component_C", instability=0.25, abstraction=0.5, error=0.25
-                ),
-                Component(
-                    name="Component_D", instability=0.7, abstraction=0, error=0.7
-                ),
-                Component(name="Component_E", instability=0, abstraction=0, error=1),
-            ],
+            MOCK_COMPONENTS_LIST,
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
@@ -34,15 +33,97 @@ MockComponent = Mock(spec=Component)
                     ("Component_E", 0, 0, 1),
                 ],
             ),
-        )
+            None,
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                ],
+            ),
+            {"name": ["match", "Component_A"]},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                    ("Component_B", 0, 1, 0),
+                    ("Component_C", 0.25, 0.5, 0.25),
+                    ("Component_D", 0.7, 0, 0.7),
+                    ("Component_E", 0, 0, 1),
+                ],
+            ),
+            {"name": ["match in", ["Component_*", "Component_E"]]},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                    ("Component_B", 0, 1, 0),
+                ],
+            ),
+            {"abstraction": 1},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                    ("Component_D", 0.7, 0, 0.7),
+                ],
+            ),
+            {"instability": ["gte", 0.7]},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_B", 0, 1, 0),
+                    ("Component_C", 0.25, 0.5, 0.25),
+                ],
+            ),
+            {"error": ["lte", 0.5]},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                    ("Component_C", 0.25, 0.5, 0.25),
+                    ("Component_D", 0.7, 0, 0.7),
+                ],
+            ),
+            {"instability": ["not eq", 0]},
+        ),
+        (
+            MOCK_COMPONENTS_LIST,
+            ASReport(
+                columns=["Component", "I", "A", "E"],
+                data=[
+                    ("Component_A", 1, 1, 1),
+                    ("Component_D", 0.7, 0, 0.7),
+                    ("Component_E", 0, 0, 1),
+                ],
+            ),
+            {"error": ["gt", 0.5]},
+        ),
     ],
 )
-def test_get_as_report(components, expected_report):
+def test_get_as_report(components, expected_report, filters):
     mock_loader = Mock(spec=Loader)
     mock_loader.get_components.return_value = components
 
     reporter = Reporter(mock_loader)
 
-    as_report = reporter.get_as_report()
+    as_report = reporter.get_as_report(filters)
 
     assert as_report == expected_report
