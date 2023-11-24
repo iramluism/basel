@@ -28,6 +28,18 @@ class Loader(metaclass=abc.ABCMeta):
     def load_components(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def calculate_error(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def calculate_instability(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def calculate_abstraction(self):
+        raise NotImplementedError()
+
     def get_component(self, component_name):
         return self.components.get(component_name)
 
