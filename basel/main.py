@@ -3,7 +3,9 @@ from pathlib import Path
 
 from basel import config
 from basel.client import Basel
-from basel.components import ModuleComponentLoader
+from basel.loaders import ModuleLoader
+from basel.parsers import PythonParser
+from basel.reports import Reporter
 from basel.views import ConsoleView
 
 COMMANDS = {
@@ -36,6 +38,18 @@ def cast_list_string(string):
         return string.split(",")
 
 
+def setup_basel_client() -> Basel:
+    parser = PythonParser()
+    loader = ModuleLoader(parser)
+
+    reporter = Reporter(loader)
+    view = ConsoleView()
+
+    client = Basel(loader, view, reporter)
+
+    return client
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog=config.PROJECT_NAME,
@@ -43,7 +57,7 @@ def main():
     )
 
     parser.add_argument("command", choices=["report"])
-    parser.add_argument("--path", required=True, type=Path)
+    parser.add_argument("-p", "--path", required=True, type=Path, nargs="+")
     parser.add_argument(
         "--ignore-dependencies",
         type=cast_list_string,
@@ -64,10 +78,7 @@ def main():
 
     _args = parser.parse_args()
 
-    loader = ModuleComponentLoader()
-    console_view = ConsoleView()
-
-    basel = Basel(loader=loader, view=console_view)
+    basel = setup_basel_client()
 
     command_name = _args.command
     command_spec = COMMANDS.get(command_name)
