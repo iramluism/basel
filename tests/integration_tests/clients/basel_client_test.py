@@ -33,7 +33,6 @@ STUB_PROJECT_A_REPORT = ASReport(
 )
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "root_path,ignore_dependencies,expected_report",
     [
