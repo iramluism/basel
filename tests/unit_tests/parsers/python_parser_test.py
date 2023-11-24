@@ -36,8 +36,8 @@ def test_get_imports(path, expected_imports):
             STUB_PROJECT_1_PATH / "module_1.py",
             [
                 ("AbstractClass1", ["ABC"], {}),
-                ("AbstractClass2", [], {"metaclass": "ABC"}),
-                ("AbstractClass3", [], {"metaclass": "ABC"}),
+                ("AbstractClass2", [], {"metaclass": "ABCMeta"}),
+                ("AbstractClass3", [], {"metaclass": "ABCMeta"}),
                 ("ConcretClass1", ["AbstractClass1"], {}),
             ],
         )

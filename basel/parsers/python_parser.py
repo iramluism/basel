@@ -44,7 +44,7 @@ class PythonParser(Parser):
 
                 _kwargs = {}
                 for keyword in stmt.keywords:
-                    _kwargs[keyword.arg] = self._get_ast_value(base)
+                    _kwargs[keyword.arg] = self._get_ast_value(keyword.value)
 
                 _class = (stmt.name, _subclasses, _kwargs)
 
@@ -52,8 +52,10 @@ class PythonParser(Parser):
 
         return _classes
 
-    def is_abstract_class(self, class_name, subclassess, keywords):
-        if "ABC" in subclassess:
+    def is_abstract_class(self, class_name, subclasses, keywords):
+        abc_classes = ["abc.ABC", "ABC"]
+
+        if any(subclass in abc_classes for subclass in subclasses):
             return True
 
         metaclass = keywords.get("metaclass")
