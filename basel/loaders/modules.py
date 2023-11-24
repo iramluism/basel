@@ -148,4 +148,4 @@ class ModuleLoader(Loader):
                     module_path = Path(root) / module
                     discovered_modules.append(module_path)
 
-        return discovered_modules
+        return sorted(discovered_modules)
