@@ -1,3 +1,5 @@
+from typing import List
+
 DECIMALS = 2
 
 
@@ -84,3 +86,20 @@ def abs_error_to_main_sequence(instability: float, abstraction: float) -> float:
     :return: absolute error to the main sequence
     """
     return round(abs(instability + abstraction - 1), DECIMALS)
+
+
+def mean(values: List[float]) -> float:
+    """Calculate the mean
+    :param values: the list of floats
+    :return: the mean values
+    """
+
+    if not values:
+        return 0
+
+    n_values = len(values)
+    sum_values = sum(values)
+
+    _mean = round(sum_values / n_values, DECIMALS)
+
+    return _mean

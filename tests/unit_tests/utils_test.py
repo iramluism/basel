@@ -36,3 +36,20 @@ def test_abstraction(in_deps, out_deps, expected_abstraction):
 def test_implementation(in_deps, out_deps, expected_implementation):
     implementation = utils.implementation(in_deps, out_deps)
     assert implementation == expected_implementation
+
+
+@pytest.mark.parametrize(
+    "instability,abstraction,expected_error",
+    [(1, 1, 1), (1, 0, 0), (0.3, 0.8, 0.1), (0, 0, 1), (0.8, 0.8, 0.6)],
+)
+def test_abs_error_to_main_sequence(instability, abstraction, expected_error):
+    error = utils.abs_error_to_main_sequence(instability, abstraction)
+    assert error == expected_error
+
+
+@pytest.mark.parametrize(
+    "values,expected_mean", [([1, 0, 0, 0], 0.25), ([], 0), ([2, 2, 3, 4], 2.75)]
+)
+def test_mean(values, expected_mean):
+    _mean = utils.mean(values)
+    assert _mean == expected_mean
