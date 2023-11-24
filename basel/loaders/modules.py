@@ -19,7 +19,30 @@ class ModuleLoader(Loader):
         exclude_packages: Optional[List[str]] = None,
     ):
         modules = self._discover_modules(paths)
+
+        rules = self._get_path_rules(exclude_components, exclude_packages)
+        modules = self._exclude_modules(modules, rules)
+
         self.add_modules(modules)
+
+    def _get_path_rules(self, modules, include_packages=True):
+        rules = list(modules or [])
+        if include_packages:
+            rules.append("*__init__.py")
+
+        return rules
+
+    def _exclude_modules(self, modules: List[Path], rules):
+        _alt_modules = []
+
+        if not rules:
+            return modules
+
+        for module in modules:
+            if not all(module.match(rule) for rule in rules):
+                _alt_modules.append(module)
+
+        return _alt_modules
 
     def _search_linked_component(self, module_path):
         for comp in self.components.values():

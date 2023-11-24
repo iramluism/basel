@@ -41,7 +41,7 @@ class Basel:
         reporter = self.reporter
         report_filters = {}
         if filter_by_components:
-            report_filters["name"] = ["eq", filter_by_components]
+            report_filters["name"] = ["match in", filter_by_components]
 
         reporter.set_loader(self.loader)
         report = reporter.get_as_report(report_filters)

@@ -1,3 +1,4 @@
+import pathlib
 from typing import Dict
 from typing import List
 from typing import NewType
@@ -19,12 +20,19 @@ class Reporter:
 
     def _filter(self, obj: dict, filters: ReportFilter):
         conditions = dict.fromkeys(filters)
+
         operations = {
             "eq": lambda a, b: a == b,
             "not eq": lambda a, b: a != b,
+            "match": lambda a, b: pathlib.Path(a).match(b),
+            "match in": lambda a, b: any(pathlib.Path(a).match(r) for r in b),
+            "gte": lambda a, b: a >= b,
+            "lte": lambda a, b: a <= b,
+            "lt": lambda a, b: a < b,
+            "gt": lambda a, b: a > b,
         }
 
-        for filter_field, filter_value in filters:
+        for filter_field, filter_value in filters.items():
             obj_value = getattr(obj, filter_field, None)
 
             op = "eq"
@@ -38,7 +46,7 @@ class Reporter:
                     "posibles value {list(operations.keys())}"
                 )
 
-            conditions[filter_value] = operation(filter_value, obj_value)
+            conditions[filter_field] = operation(obj_value, filter_value)
 
         match_all_conditions = all(conditions.values())
 
