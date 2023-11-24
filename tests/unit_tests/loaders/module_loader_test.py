@@ -349,3 +349,36 @@ def test_calculate_abstraction(components, expected_abstraction):
     for comp_name, abstraction in expected_abstraction.items():
         comp = loader.get_component(comp_name)
         assert comp.abstraction == abstraction
+
+
+@pytest.mark.parametrize(
+    "components,expected_error",
+    [
+        (
+            [
+                Component(name="Component_A", instability=1, abstraction=1),
+                Component(name="Component_B", instability=0, abstraction=1),
+                Component(name="Component_C", instability=0.25, abstraction=0.5),
+                Component(name="Component_D", instability=0.7, abstraction=0.75),
+                Component(name="Component_E", instability=0, abstraction=0),
+            ],
+            {
+                "Component_A": 1,
+                "Component_B": 0,
+                "Component_C": 0.25,
+                "Component_D": 0.45,
+                "Component_E": 1,
+            },
+        )
+    ],
+)
+def test_calculate_error(components, expected_error):
+    mock_parser = Mock(spec=Parser)
+
+    loader = ModuleLoader(mock_parser, components)
+
+    loader.calculate_error()
+
+    for comp_name, error in expected_error.items():
+        comp = loader.get_component(comp_name)
+        assert comp.error == error

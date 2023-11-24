@@ -72,6 +72,11 @@ class ModuleLoader(Loader):
 
         return input_deps, output_deps
 
+    def calculate_error(self):
+        for comp in self.components.values():
+            error = utils.abs_error_to_main_sequence(comp.instability, comp.abstraction)
+            comp.set_error(error)
+
     def calculate_instability(self):
         for comp in self.components.values():
             input_deps, output_deps = self._get_input_and_output_deps_of_component(comp)

@@ -1,4 +1,5 @@
 import abc
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -8,6 +9,8 @@ from basel.parsers.parser import Parser
 
 
 class Loader(metaclass=abc.ABCMeta):
+    components: Dict[str, Component]
+
     def __init__(
         self,
         parser: Parser,
