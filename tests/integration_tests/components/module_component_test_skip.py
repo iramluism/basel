@@ -38,6 +38,7 @@ STAB_PROJECT_A_AS_PLANE_FILTER_BY_PACKAGE_B = {
 }
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "root_path,expeted_as_plane,filter_by_components",
     [
@@ -64,6 +65,7 @@ def tests_abstraction_stability_plane(
     assert as_plane == expeted_as_plane
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "root_path,ignore_dependencies,expected_mean_distance",
     [

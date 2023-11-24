@@ -30,3 +30,11 @@ repos:
     files: "basel|tests"
     language: system
     entry: flake8 --config setup.cfg
+
+  - id: tests
+    name: "Run Tests"
+    files: "basel|tests"
+    stages: [push, pre-push]
+    language: system
+    entry: bash "pyests -vv"
+    always_run: true
