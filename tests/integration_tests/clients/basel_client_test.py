@@ -23,6 +23,8 @@ STUB_PROJECT_A_REPORT_DATA = [
     ("tests/stubs/stub_project_a/package_b/module_b1.py", 0.5, 0.0, 0.5),
     ("tests/stubs/stub_project_a/package_b/module_b2.py", 1.0, 0.0, 0.0),
     ("tests/stubs/stub_project_a/package_b/module_b3.py", 1, 1, 1),
+    None,
+    ("Mean", 0.75, 0.61, 0.58),
 ]
 
 STUB_PROJECT_A_MEAN_DISTANCE = 0.58

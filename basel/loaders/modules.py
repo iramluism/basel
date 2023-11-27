@@ -172,3 +172,15 @@ class ModuleLoader(Loader):
                     discovered_modules.append(module_path)
 
         return sorted(discovered_modules)
+
+    def calculate_mean_error(self):
+        errors = [comp.error for comp in self.get_components()]
+        return utils.mean(errors)
+
+    def calculate_mean_abstraction(self):
+        abstractions = [comp.abstraction for comp in self.get_components()]
+        return utils.mean(abstractions)
+
+    def calculate_mean_instability(self):
+        instabilities = [comp.instability for comp in self.get_components()]
+        return utils.mean(instabilities)
