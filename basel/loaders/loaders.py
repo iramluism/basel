@@ -40,6 +40,18 @@ class Loader(metaclass=abc.ABCMeta):
     def calculate_abstraction(self):
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def calculate_mean_error(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def calculate_mean_abstraction(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def calculate_mean_instability(self):
+        raise NotImplementedError()
+
     def get_component(self, component_name):
         return self.components.get(component_name)
 

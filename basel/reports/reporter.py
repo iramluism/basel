@@ -75,6 +75,13 @@ class Reporter:
 
             data.append(row)
 
+        mean_error = self._loader.calculate_mean_error()
+        mean_abstraction = self._loader.calculate_mean_abstraction()
+        mean_instability = self._loader.calculate_mean_instability()
+
+        data.append(None)
+        data.append(("Mean", mean_instability, mean_abstraction, mean_error))
+
         report = ASReport(
             columns=columns,
             data=data,
