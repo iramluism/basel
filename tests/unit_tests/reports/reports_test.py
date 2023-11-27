@@ -19,10 +19,11 @@ MOCK_COMPONENTS_LIST = [
 
 
 @pytest.mark.parametrize(
-    "components,expected_report,filters",
+    "components,means,expected_report,filters",
     [
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
@@ -31,22 +32,28 @@ MOCK_COMPONENTS_LIST = [
                     ("Component_C", 0.25, 0.5, 0.25),
                     ("Component_D", 0.7, 0, 0.7),
                     ("Component_E", 0, 0, 1),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             None,
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_A", 1, 1, 1),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"name": ["match", "Component_A"]},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
@@ -55,72 +62,92 @@ MOCK_COMPONENTS_LIST = [
                     ("Component_C", 0.25, 0.5, 0.25),
                     ("Component_D", 0.7, 0, 0.7),
                     ("Component_E", 0, 0, 1),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"name": ["match in", ["Component_*", "Component_E"]]},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_A", 1, 1, 1),
                     ("Component_B", 0, 1, 0),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"abstraction": 1},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_A", 1, 1, 1),
                     ("Component_D", 0.7, 0, 0.7),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"instability": ["gte", 0.7]},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_B", 0, 1, 0),
                     ("Component_C", 0.25, 0.5, 0.25),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"error": ["lte", 0.5]},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_A", 1, 1, 1),
                     ("Component_C", 0.25, 0.5, 0.25),
                     ("Component_D", 0.7, 0, 0.7),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"instability": ["not eq", 0]},
         ),
         (
             MOCK_COMPONENTS_LIST,
+            (0.39, 0.51, 0.59),
             ASReport(
                 columns=["Component", "I", "A", "E"],
                 data=[
                     ("Component_A", 1, 1, 1),
                     ("Component_D", 0.7, 0, 0.7),
                     ("Component_E", 0, 0, 1),
+                    None,
+                    ("Mean", 0.39, 0.51, 0.59),
                 ],
             ),
             {"error": ["gt", 0.5]},
         ),
     ],
 )
-def test_get_as_report(components, expected_report, filters):
+def test_get_as_report(components, means, expected_report, filters):
     mock_loader = Mock(spec=Loader)
     mock_loader.get_components.return_value = components
+    mock_loader.calculate_mean_instability.return_value = means[0]
+    mock_loader.calculate_mean_abstraction.return_value = means[1]
+    mock_loader.calculate_mean_error.return_value = means[2]
 
     reporter = Reporter(mock_loader)
 
