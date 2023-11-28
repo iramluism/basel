@@ -51,3 +51,32 @@ class Basel:
         self.view.render_report(formatted_report)
 
         return report
+
+    def component_relations(
+        self,
+        root_path: Path,
+        ignore_dependencies: Optional[List[str]] = None,
+        exclude_components: Optional[List[str]] = None,
+        exclude_packages: bool = False,
+        filter_by_components: Optional[List[str]] = None,
+        report_format: Optional[str] = None,
+    ):
+        self.loader.load_components(
+            paths=root_path,
+            ignore_dependencies=ignore_dependencies,
+            exclude_components=exclude_components,
+            exclude_packages=exclude_packages,
+        )
+
+        reporter = self.reporter
+        report_filters = {}
+        if filter_by_components:
+            report_filters["name"] = ["match in", filter_by_components]
+
+        reporter.set_loader(self.loader)
+        report = reporter.get_component_links_report(report_filters)
+        formatted_report = reporter.format_report(report, report_format)
+
+        self.view.render_report(formatted_report)
+
+        return report

@@ -20,7 +20,18 @@ COMMANDS = {
             ("filter", "filter_by_components"),
             ("format", "report_format"),
         ],
-    }
+    },
+    "rel": {
+        "method": "component_relations",
+        "args": [
+            ("path", "root_path"),
+            ("ignore_dependencies", "ignore_dependencies"),
+            ("exclude", "exclude_components"),
+            ("no-packages", "exclude_packages"),
+            ("filter", "filter_by_components"),
+            ("format", "report_format"),
+        ],
+    },
 }
 
 
@@ -58,7 +69,7 @@ def main():
         description="Calculate the abstraction and stability",
     )
 
-    parser.add_argument("command", choices=["report"])
+    parser.add_argument("command", choices=["report", "rel"])
     parser.add_argument("-p", "--path", required=True, type=Path, nargs="+")
     parser.add_argument(
         "--ignore-dependencies",
@@ -94,7 +105,12 @@ def main():
     method_args = get_args_from_namespace(command_name, _args)
 
     method = getattr(basel, method_name)
-    method(**method_args)
+
+    try:
+        method(**method_args)
+    except Exception as e:
+        fail_color = "\033[91m"
+        print(f"{fail_color}ERROR: {e} {fail_color}")
 
 
 if __name__ == "__main__":
