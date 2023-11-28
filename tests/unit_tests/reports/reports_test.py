@@ -255,3 +255,18 @@ def test_format_report(report, report_format, expected_result):
     reporter = Reporter()
     result = reporter.format_report(report, report_format)
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "report,report_format",
+    [
+        (ASReport(), ReportFormat.UML),
+        (LinkReport(), ReportFormat.MEAN_I),
+        (LinkReport(), ReportFormat.MEAN_A),
+        (LinkReport(), ReportFormat.MEAN_E),
+    ],
+)
+def test_raise_error_on_incorrect_report_format(report, report_format):
+    reporter = Reporter()
+    with pytest.raises(ValueError):
+        reporter.format_report(report, report_format)

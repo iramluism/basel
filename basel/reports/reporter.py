@@ -143,19 +143,19 @@ class Reporter:
         _report_formats = {
             ReportFormat.BASIC: (self._format_basic, "*"),
             ReportFormat.HTML: (self._format_html, "*"),
-            ReportFormat.MEAN_I: (self._format_instability_mean, ASReport.name),
-            ReportFormat.MEAN_A: (self._format_abstraction_mean, ASReport.name),
-            ReportFormat.MEAN_E: (self._format_error_mean, ASReport.name),
-            ReportFormat.MEAN: (self._format_error_mean, ASReport.name),
-            ReportFormat.UML: (self._format_uml, LinkReport.name),
+            ReportFormat.MEAN_I: (self._format_instability_mean, [ASReport.name]),
+            ReportFormat.MEAN_A: (self._format_abstraction_mean, [ASReport.name]),
+            ReportFormat.MEAN_E: (self._format_error_mean, [ASReport.name]),
+            ReportFormat.MEAN: (self._format_error_mean, [ASReport.name]),
+            ReportFormat.UML: (self._format_uml, [LinkReport.name]),
         }
 
         if not report_format:
             report_format = ReportFormat.BASIC
 
-        format_fn, report_name = _report_formats.get(report_format)
+        format_fn, available_reports = _report_formats.get(report_format)
 
-        if report_name != "*" and report_name != report.name:
+        if available_reports != "*" and report.name not in available_reports:
             raise ValueError(
                 f"The format {report_format} is not valid for {report.name}"
             )
