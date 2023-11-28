@@ -202,7 +202,7 @@ class Reporter:
         uml_staments = []
 
         for label, component in labels.items():
-            uml_staments.append(f"component [${component}]")
+            uml_staments.append(f"component [{component}]")
 
         for deps in report.data:
             comp_name = deps[0]
@@ -215,7 +215,7 @@ class Reporter:
 
                 from_comp_name = labels.get(from_comp_idx)
                 to_comp_name = labels.get(to_comp_idx)
-                uml_staments.append(f"[${from_comp_name}] --> [${to_comp_name}]")
+                uml_staments.append(f"[{from_comp_name}] --> [{to_comp_name}]")
 
         uml_staments = ["@startuml"] + uml_staments + ["@enduml"]
 

@@ -219,13 +219,13 @@ def test_get_component_links_report(components, links, expected_report):
             ),
             ReportFormat.UML,
             "@startuml\n"
-            "component [$A]\n"
-            "component [$B]\n"
-            "component [$C]\n"
-            "component [$D]\n"
-            "[$A] --> [$B]\n"
-            "[$B] --> [$C]\n"
-            "[$A] --> [$D]\n"
+            "component [A]\n"
+            "component [B]\n"
+            "component [C]\n"
+            "component [D]\n"
+            "[A] --> [B]\n"
+            "[B] --> [C]\n"
+            "[A] --> [D]\n"
             "@enduml",
         ),
         (
@@ -241,12 +241,12 @@ def test_get_component_links_report(components, links, expected_report):
             ),
             ReportFormat.UML,
             "@startuml\n"
-            "component [$A]\n"
-            "component [$B]\n"
-            "component [$C]\n"
-            "component [$D]\n"
-            "[$A] --> [$B]\n"
-            "[$B] --> [$C]\n"
+            "component [A]\n"
+            "component [B]\n"
+            "component [C]\n"
+            "component [D]\n"
+            "[A] --> [B]\n"
+            "[B] --> [C]\n"
             "@enduml",
         ),
     ],
