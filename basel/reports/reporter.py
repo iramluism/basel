@@ -56,6 +56,40 @@ class Reporter:
 
         return match_all_conditions
 
+    def get_component_links_report(self):
+        out_deps = {}
+        for link in self._loader.get_links():
+            deps = out_deps.get(link.source.name, [])
+            deps.append(link.target.name)
+            out_deps[link.source.name] = deps
+
+        data = []
+
+        labels = {
+            comp.name: str(idx + 1)
+            for idx, comp in enumerate(self._loader.get_components())
+        }
+        for eval_comp, idx in labels.items():
+            row = [idx]
+            for comp in labels.keys():
+                value = 0
+                deps = out_deps.get(comp, [])
+                if eval_comp in deps:
+                    value = 1
+                row.append(value)
+
+            data.append(tuple(row))
+
+        columns = ["Components"] + list(labels.values())
+
+        description = "\nLabels:\n"
+        for comp_name, label in labels.items():
+            description += f"{label}: {comp_name}\n"
+
+        report = Report(columns=columns, data=data, description=description)
+
+        return report
+
     def get_as_report(self, filters: Optional[ReportFilter] = None) -> ASReport:
         data = []
         columns = ["Component", "I", "A", "E"]

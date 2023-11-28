@@ -1,8 +1,10 @@
 from unittest.mock import Mock
 
 from basel.components import Component
+from basel.components import Link
 from basel.loaders import Loader
 from basel.reports import ASReport
+from basel.reports import Report
 from basel.reports import Reporter
 import pytest
 
@@ -154,3 +156,47 @@ def test_get_as_report(components, means, expected_report, filters):
     as_report = reporter.get_as_report(filters)
 
     assert as_report == expected_report
+
+
+@pytest.mark.parametrize(
+    "components,links,expected_report",
+    [
+        (
+            [
+                Component("A"),
+                Component("B"),
+                Component("C"),
+                Component("D"),
+            ],
+            [
+                # A --* B --* C
+                # |
+                # *
+                # D
+                Link(source=Component("A"), target=Component("B")),
+                Link(source=Component("B"), target=Component("C")),
+                Link(source=Component("A"), target=Component("D")),
+            ],
+            Report(
+                columns=["Components", "1", "2", "3", "4"],
+                data=[
+                    ("1", 0, 0, 0, 0),
+                    ("2", 1, 0, 0, 0),
+                    ("3", 0, 1, 0, 0),
+                    ("4", 1, 0, 0, 0),
+                ],
+                description="\nLabels:\n1: A\n2: B\n3: C\n4: D\n",
+            ),
+        )
+    ],
+)
+def test_get_component_links_report(components, links, expected_report):
+    mock_loader = Mock(spec=Loader)
+    mock_loader.get_components.return_value = components
+    mock_loader.get_links.return_value = links
+
+    reporter = Reporter(mock_loader)
+
+    report = reporter.get_component_links_report()
+
+    assert report == expected_report
