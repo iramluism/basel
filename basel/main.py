@@ -17,6 +17,7 @@ COMMANDS = {
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
+            ("format", "report_format"),
         ],
     }
 }
@@ -75,6 +76,10 @@ def main():
 
     parser.add_argument(
         "-f", "--filter", help="Filter Report by Components", type=cast_list_string
+    )
+
+    parser.add_argument(
+        "-fmt", "--format", help="Report Format", type=str, default=None
     )
 
     _args = parser.parse_args()

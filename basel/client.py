@@ -30,6 +30,7 @@ class Basel:
         exclude_components: Optional[List[str]] = None,
         exclude_packages: bool = False,
         filter_by_components: Optional[List[str]] = None,
+        report_format: Optional[str] = None,
     ):
         self.loader.load_components(
             paths=root_path,
@@ -46,6 +47,6 @@ class Basel:
         reporter.set_loader(self.loader)
         report = reporter.get_as_report(report_filters)
 
-        self.view.render_report(report)
+        self.view.render_report(report, report_format)
 
         return report
