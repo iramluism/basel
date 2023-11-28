@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 
 from basel import config
+from basel import ReportFormat
 from basel.client import Basel
 from basel.loaders import ModuleLoader
 from basel.parsers import PythonParser
@@ -79,7 +80,7 @@ def main():
     )
 
     parser.add_argument(
-        "-fmt", "--format", help="Report Format", type=str, default=None
+        "-fmt", "--format", help="Report Format", type=ReportFormat, default=None
     )
 
     _args = parser.parse_args()

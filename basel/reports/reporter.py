@@ -7,6 +7,10 @@ from typing import Union
 
 from basel.loaders import Loader
 from basel.reports.as_plane import ASReport
+from basel.reports.formats import ReportFormat
+from basel.reports.reports import Report
+from tabulate import SEPARATING_LINE
+from tabulate import tabulate
 
 ReportFilter = NewType("ReportFilter", Dict[str, Union[str, List[str]]])
 
@@ -88,3 +92,66 @@ class Reporter:
         )
 
         return report
+
+    def format_report(
+        self, report: Report, report_format: Optional[ReportFormat] = None
+    ):
+        _report_formats = {
+            ReportFormat.BASIC: self._format_basic,
+            ReportFormat.HTML: self._format_html,
+            ReportFormat.MEAN_I: self._format_instability_mean,
+            ReportFormat.MEAN_A: self._format_abstraction_mean,
+            ReportFormat.MEAN_E: self._format_error_mean,
+            ReportFormat.MEAN: self._format_error_mean,
+        }
+
+        if not report_format:
+            report_format = ReportFormat.BASIC
+
+        format_fn = _report_formats.get(report_format)
+
+        return format_fn(report)
+
+    def _format_basic(self, report: Report) -> str:
+        table = self._get_table_from_report(report, report_format=ReportFormat.BASIC)
+        return table
+
+    def _format_html(self, report: Report) -> str:
+        table = self._get_table_from_report(report, report_format=ReportFormat.HTML)
+        return table
+
+    def _format_instability_mean(self, report: Report) -> str:
+        totals = report.data[-1]
+        i_total = totals[1]
+        return i_total
+
+    def _format_abstraction_mean(self, report: Report) -> str:
+        totals = report.data[-1]
+        i_total = totals[2]
+        return i_total
+
+    def _format_error_mean(self, report: Report) -> str:
+        totals = report.data[-1]
+        i_total = totals[3]
+        return i_total
+
+    def _get_table_from_report(
+        self, report: Report, report_format: ReportFormat = ReportFormat.BASIC
+    ):
+        _tabulate_formats = {
+            ReportFormat.BASIC: "simple",
+            ReportFormat.HTML: "html",
+        }
+
+        data = []
+        report_data_len = len(report.data)
+        for i, row in enumerate(report.data):
+            if not row and (i + 1) != report_data_len:
+                data.append(SEPARATING_LINE)
+            else:
+                data.append(list(row))
+
+        tabulate_format = _tabulate_formats.get(report_format, ReportFormat.BASIC)
+        table = tabulate(data, headers=report.columns, tablefmt=tabulate_format)
+
+        return table

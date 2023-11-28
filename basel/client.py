@@ -46,7 +46,8 @@ class Basel:
 
         reporter.set_loader(self.loader)
         report = reporter.get_as_report(report_filters)
+        formatted_report = reporter.format_report(report, report_format)
 
-        self.view.render_report(report, report_format)
+        self.view.render_report(formatted_report)
 
         return report
