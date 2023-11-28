@@ -6,11 +6,13 @@ from typing import NewType
 from typing import Optional
 from typing import Union
 
+from basel import config
 from basel.loaders import Loader
 from basel.reports.as_plane import ASReport
 from basel.reports.formats import ReportFormat
 from basel.reports.reports import LinkReport
 from basel.reports.reports import Report
+from plantuml import PlantUML
 from tabulate import SEPARATING_LINE
 from tabulate import tabulate
 
@@ -148,6 +150,7 @@ class Reporter:
             ReportFormat.MEAN_E: (self._format_error_mean, [ASReport.name]),
             ReportFormat.MEAN: (self._format_error_mean, [ASReport.name]),
             ReportFormat.UML: (self._format_uml, [LinkReport.name]),
+            ReportFormat.UML_IMG: (self._format_uml_img, [LinkReport.name]),
         }
 
         if not report_format:
@@ -218,6 +221,12 @@ class Reporter:
 
         uml_text = "\n".join(uml_staments)
         return uml_text
+
+    def _format_uml_img(self, report):
+        uml = self._format_uml(report)
+        plant_uml = PlantUML(url=config.PLANTUML_URL)
+        uml_img = plant_uml.processes(uml)
+        return uml_img
 
     def _get_table_from_report(
         self, report: Report, report_format: ReportFormat = ReportFormat.BASIC

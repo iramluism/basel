@@ -4,10 +4,11 @@ from pathlib import Path
 from basel import config
 from basel import ReportFormat
 from basel.client import Basel
+from basel.dtos import LogType
+from basel.exporters import FileExporter
 from basel.loaders import ModuleLoader
 from basel.parsers import PythonParser
 from basel.reports import Reporter
-from basel.views import ConsoleView
 
 COMMANDS = {
     "report": {
@@ -56,9 +57,9 @@ def setup_basel_client() -> Basel:
     loader = ModuleLoader(parser)
 
     reporter = Reporter(loader)
-    view = ConsoleView()
+    exporter = FileExporter()
 
-    client = Basel(loader, view, reporter)
+    client = Basel(loader, exporter, reporter)
 
     return client
 
@@ -106,11 +107,23 @@ def main():
 
     method = getattr(basel, method_name)
 
-    try:
-        method(**method_args)
-    except Exception as e:
-        fail_color = "\033[91m"
-        print(f"{fail_color}ERROR: {e} {fail_color}")
+    result = method(**method_args)
+
+    error_color = "\033[91m"
+    success_color = "\033[92m"
+
+    stdout = ""
+    for log in result.logs:
+        color = success_color
+        if log.type == LogType.ERROR:
+            color = error_color
+
+        stdout += f"\n{color}{log.content}{color}"
+
+    if result.content:
+        stdout += str(result.content)
+
+    print(stdout)
 
 
 if __name__ == "__main__":
