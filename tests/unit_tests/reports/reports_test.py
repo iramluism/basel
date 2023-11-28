@@ -1,9 +1,12 @@
 from unittest.mock import Mock
 
 from basel.components import Component
+from basel.components import Link
 from basel.loaders import Loader
 from basel.reports import ASReport
+from basel.reports import LinkReport
 from basel.reports import Reporter
+from basel.reports import ReportFormat
 import pytest
 
 MockComponent = Mock(spec=Component)
@@ -154,3 +157,116 @@ def test_get_as_report(components, means, expected_report, filters):
     as_report = reporter.get_as_report(filters)
 
     assert as_report == expected_report
+
+
+@pytest.mark.parametrize(
+    "components,links,expected_report",
+    [
+        (
+            [
+                Component("A"),
+                Component("B"),
+                Component("C"),
+                Component("D"),
+            ],
+            [
+                # A --* B --* C
+                # |
+                # *
+                # D
+                Link(source=Component("A"), target=Component("B")),
+                Link(source=Component("B"), target=Component("C")),
+                Link(source=Component("A"), target=Component("D")),
+            ],
+            LinkReport(
+                columns=["Components", "1", "2", "3", "4"],
+                data=[
+                    ("1", 0, 0, 0, 0),
+                    ("2", 1, 0, 0, 0),
+                    ("3", 0, 1, 0, 0),
+                    ("4", 1, 0, 0, 0),
+                ],
+                footer="\nLabels:\n1: A\n2: B\n3: C\n4: D\n",
+            ),
+        )
+    ],
+)
+def test_get_component_links_report(components, links, expected_report):
+    mock_loader = Mock(spec=Loader)
+    mock_loader.get_components.return_value = components
+    mock_loader.get_links.return_value = links
+
+    reporter = Reporter(mock_loader)
+
+    report = reporter.get_component_links_report()
+
+    assert report == expected_report
+
+
+@pytest.mark.parametrize(
+    "report,report_format,expected_result",
+    [
+        (
+            LinkReport(
+                columns=["Components", "1", "2", "3", "4"],
+                data=[
+                    ("1", 0, 0, 0, 0),
+                    ("2", 1, 0, 0, 0),
+                    ("3", 0, 1, 0, 0),
+                    ("4", 1, 0, 0, 0),
+                ],
+                footer="\nLabels:\n1: A\n2: B\n3: C\n4: D\n",
+            ),
+            ReportFormat.UML,
+            "@startuml\n"
+            "component [A]\n"
+            "component [B]\n"
+            "component [C]\n"
+            "component [D]\n"
+            "[A] --> [B]\n"
+            "[B] --> [C]\n"
+            "[A] --> [D]\n"
+            "@enduml",
+        ),
+        (
+            LinkReport(
+                columns=["Components", "1", "2", "3", "4"],
+                data=[
+                    ("1", 0, 0, 0, 0),
+                    ("2", 1, 0, 0, 0),
+                    ("3", 0, 1, 0, 0),
+                    ("4", 0, 0, 0, 0),
+                ],
+                footer="\nLabels:\n1: A\n2: B\n3: C\n4: D\n",
+            ),
+            ReportFormat.UML,
+            "@startuml\n"
+            "component [A]\n"
+            "component [B]\n"
+            "component [C]\n"
+            "component [D]\n"
+            "[A] --> [B]\n"
+            "[B] --> [C]\n"
+            "@enduml",
+        ),
+    ],
+)
+def test_format_report(report, report_format, expected_result):
+    reporter = Reporter()
+    result = reporter.format_report(report, report_format)
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "report,report_format",
+    [
+        (ASReport(), ReportFormat.UML),
+        (LinkReport(), ReportFormat.MEAN_I),
+        (LinkReport(), ReportFormat.MEAN_A),
+        (LinkReport(), ReportFormat.MEAN_E),
+    ],
+)
+def test_raise_error_on_incorrect_report_format(report, report_format):
+    reporter = Reporter()
+    with pytest.raises(ValueError):
+        reporter.format_report(report, report_format)

@@ -12,3 +12,8 @@ class Report:
     data: List[Any] = field(default_factory=list)
     footer: Optional[str] = None
     description: Optional[str] = None
+
+
+@dataclass
+class LinkReport(Report):
+    name: str = "Link Report"
