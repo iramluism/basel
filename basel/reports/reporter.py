@@ -8,6 +8,7 @@ from typing import Union
 from basel.loaders import Loader
 from basel.reports.as_plane import ASReport
 from basel.reports.formats import ReportFormat
+from basel.reports.reports import LinkReport
 from basel.reports.reports import Report
 from tabulate import SEPARATING_LINE
 from tabulate import tabulate
@@ -56,7 +57,11 @@ class Reporter:
 
         return match_all_conditions
 
-    def get_component_links_report(self):
+    def get_component_links_report(
+        self, filters: Optional[ReportFilter] = None
+    ) -> LinkReport:
+        self._loader.load_links()
+
         out_deps = {}
         for link in self._loader.get_links():
             deps = out_deps.get(link.source.name, [])
@@ -65,10 +70,14 @@ class Reporter:
 
         data = []
 
-        labels = {
-            comp.name: str(idx + 1)
-            for idx, comp in enumerate(self._loader.get_components())
-        }
+        labels = {}
+        for idx, comp in enumerate(self._loader.get_components()):
+            if filters and not self._filter(comp, filters):
+                continue
+
+            label = str(idx)
+            labels[comp.name] = label
+
         for eval_comp, idx in labels.items():
             row = [idx]
             for comp in labels.keys():
@@ -86,7 +95,7 @@ class Reporter:
         for comp_name, label in labels.items():
             description += f"{label}: {comp_name}\n"
 
-        report = Report(columns=columns, data=data, description=description)
+        report = LinkReport(columns=columns, data=data, description=description)
 
         return report
 
@@ -131,18 +140,23 @@ class Reporter:
         self, report: Report, report_format: Optional[ReportFormat] = None
     ):
         _report_formats = {
-            ReportFormat.BASIC: self._format_basic,
-            ReportFormat.HTML: self._format_html,
-            ReportFormat.MEAN_I: self._format_instability_mean,
-            ReportFormat.MEAN_A: self._format_abstraction_mean,
-            ReportFormat.MEAN_E: self._format_error_mean,
-            ReportFormat.MEAN: self._format_error_mean,
+            ReportFormat.BASIC: (self._format_basic, "*"),
+            ReportFormat.HTML: (self._format_html, "*"),
+            ReportFormat.MEAN_I: (self._format_instability_mean, ASReport.name),
+            ReportFormat.MEAN_A: (self._format_abstraction_mean, ASReport.name),
+            ReportFormat.MEAN_E: (self._format_error_mean, ASReport.name),
+            ReportFormat.MEAN: (self._format_error_mean, ASReport.name),
         }
 
         if not report_format:
             report_format = ReportFormat.BASIC
 
-        format_fn = _report_formats.get(report_format)
+        format_fn, report_name = _report_formats.get(report_format)
+
+        if report_name != "*" and report_name != report.name:
+            raise ValueError(
+                f"The format {report_format} is not valid for {report.name}"
+            )
 
         return format_fn(report)
 
@@ -187,5 +201,8 @@ class Reporter:
 
         tabulate_format = _tabulate_formats.get(report_format, ReportFormat.BASIC)
         table = tabulate(data, headers=report.columns, tablefmt=tabulate_format)
+
+        if report.description:
+            table += report.description
 
         return table

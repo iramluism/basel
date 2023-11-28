@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -15,7 +14,6 @@ class Report:
     description: Optional[str] = None
 
 
+@dataclass
 class LinkReport(Report):
-    name = "Link Report"
-    in_link: Optional[Dict[str, Any]] = field(default_factory=dict)
-    out_link: Optional[Dict[str, Any]] = field(default_factory=dict)
+    name: str = "Link Report"
