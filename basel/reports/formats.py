@@ -8,3 +8,4 @@ class ReportFormat(str, Enum):
     MEAN_A = "mean_a"
     MEAN_E = "mean_e"
     MEAN = "mean"
+    UML = "uml"

@@ -29,6 +29,10 @@ class Loader(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def load_links(self, *args, **kwargs):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def calculate_error(self):
         raise NotImplementedError()
 
