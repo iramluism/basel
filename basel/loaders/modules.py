@@ -56,13 +56,20 @@ class ModuleLoader(Loader):
 
         return _imports
 
+    def _exists_link(self, source_comp: Component, target_comp: Component):
+        for link in self.links:
+            if link.source == source_comp and link.target == target_comp:
+                return True
+
+        return False
+
     def load_links(self):
         for comp_name, comp in self.components.items():
             comp_imports = self._get_imports_from_component_nodes(comp)
             for _import in comp_imports:
                 module_path = self.search_py_module(_import)
                 linked_component = self._search_linked_component(str(module_path))
-                if linked_component:
+                if linked_component and not self._exists_link(comp, linked_component):
                     self.link_component(comp, linked_component)
 
     def _format_to_py_module_path(self, _import: str):

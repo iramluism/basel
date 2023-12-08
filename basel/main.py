@@ -2,11 +2,13 @@ import argparse
 from pathlib import Path
 
 from basel import config
+from basel import ReportFormat
 from basel.client import Basel
+from basel.dtos import LogType
+from basel.exporters import FileExporter
 from basel.loaders import ModuleLoader
 from basel.parsers import PythonParser
 from basel.reports import Reporter
-from basel.views import ConsoleView
 
 COMMANDS = {
     "report": {
@@ -17,8 +19,20 @@ COMMANDS = {
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
+            ("format", "report_format"),
         ],
-    }
+    },
+    "rel": {
+        "method": "component_relations",
+        "args": [
+            ("path", "root_path"),
+            ("ignore_dependencies", "ignore_dependencies"),
+            ("exclude", "exclude_components"),
+            ("no-packages", "exclude_packages"),
+            ("filter", "filter_by_components"),
+            ("format", "report_format"),
+        ],
+    },
 }
 
 
@@ -43,9 +57,9 @@ def setup_basel_client() -> Basel:
     loader = ModuleLoader(parser)
 
     reporter = Reporter(loader)
-    view = ConsoleView()
+    exporter = FileExporter()
 
-    client = Basel(loader, view, reporter)
+    client = Basel(loader, exporter, reporter)
 
     return client
 
@@ -56,7 +70,7 @@ def main():
         description="Calculate the abstraction and stability",
     )
 
-    parser.add_argument("command", choices=["report"])
+    parser.add_argument("command", choices=["report", "rel"])
     parser.add_argument("-p", "--path", required=True, type=Path, nargs="+")
     parser.add_argument(
         "--ignore-dependencies",
@@ -77,6 +91,10 @@ def main():
         "-f", "--filter", help="Filter Report by Components", type=cast_list_string
     )
 
+    parser.add_argument(
+        "-fmt", "--format", help="Report Format", type=ReportFormat, default=None
+    )
+
     _args = parser.parse_args()
 
     basel = setup_basel_client()
@@ -88,7 +106,24 @@ def main():
     method_args = get_args_from_namespace(command_name, _args)
 
     method = getattr(basel, method_name)
-    method(**method_args)
+
+    result = method(**method_args)
+
+    error_color = "\033[91m"
+    success_color = "\033[92m"
+
+    stdout = ""
+    for log in result.logs:
+        color = success_color
+        if log.type == LogType.ERROR:
+            color = error_color
+
+        stdout += f"\n{color}{log.content}{color}"
+
+    if result.content:
+        stdout += str(result.content)
+
+    print(stdout)
 
 
 if __name__ == "__main__":
