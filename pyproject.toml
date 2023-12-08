@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "basel"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["Iram Luis Morales Santos <iramluism@gmail.com>", "Maura Elena Diaz Boente <mdboente@gmail.com>"]
 readme = "README.md"
