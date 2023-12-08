@@ -37,7 +37,7 @@ Mean                                     0.75  0.67  0.45
 This report uses a binary matrix, where 1 represents a relation, and 0 does not. All components are assigned to an index. Check the legend below the report to identify each component.
 
 ```
-basel report --path ./path/to/project
+basel rel --path ./path/to/project
 ```
 Output:
 ```
