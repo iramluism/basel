@@ -1,6 +1,6 @@
 # Basel Library
 
-![Basel Logo](docs/images/logo.png)
+![Basel Logo](https://github.com/iramluism/basel/raw/main/docs/images/logo.png)
 
 Basel Library is a powerful tool designed for calculating, reporting, and analyzing the architecture of a project.
 
