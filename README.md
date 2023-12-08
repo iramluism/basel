@@ -1,125 +1,97 @@
+# Basel Library
 
-## Basel Library
+![Basel Logo](docs/images/logo.png)
 
-This library calculates the abstraction and the stability of a project
+Basel Library is a powerful tool designed for calculating, reporting, and analyzing the architecture of a project.
 
+## Key Concepts
 
-#### Structure of project
+* **Abstraction**: Level of definition vs implementation inside a component.
+* **Stability**: Level of incoming and outgoing dependencies that a component has.
 
-````
-/src
-    |-client          (the main client)
-    |-components      (module components and handlers)
-    |-config          (configuration file)
-    |-dtos            (data transfer objects)
-    |-icomponents     (interface components)
-    |-views           (views, console, etc)
-````
+## Installation
 
-
-#### Languages and frameworks of the project
-````
-* Python 3.10.12
-
-````
-
-#### Install Poetry
-
-Check the [Link](https://python-poetry.org/docs/#installing-manually)
-
-#### Install Dependencies
-
-```
-poetry install
+```bash
+pip install basel
 ```
 
-#### Run tests
+## Reports
+Abstract/Instability and Component Relationship reports are the main data you can obtain from an architecture. To generate each one, you can use the report and rel options.
 
-Run from the project root directory
-
-````
-poetry run pytest -vv
-````
-
-To check the test coverage run:
+### Abstraction/Stability (AE) Report
 ```
-poetry run coverage run -m pytest -vv
-poetry run coverage report
+basel report --path ./path/to/project
 ```
-
-### Basic Usage
-
-> [!WARNING] 
-> These instructions are for local development, still not ready to implement with pre-commit or as any Python package distribution.
-
-1. Clone the repository on your local machine
-   ```
-   git clone git@github.com:iramluism/basel.git
-   ```
-2. Go to your desired project 
-3. install the basel library in editable mode 
-   
-   Using pip
-   ```
-   pip install ./path/to/basel_repo -e 
-   ```
-   
-   Using Poetry
-   ```
-   poetry add ./path/to/basel_repo -e
-   ```
-4. Run the library 
-
-    ```
-    python -m basel report --path ./path/to/desired-project
-    ```
-
-### Examples
-In this repository, two different projects can help you to understand how Basel works. In these little projects, the components are mixed and related to all of them, and with different kinds of Python importations, with abstract classes. check the `tests/stubs` for more details. We can try with one of them
-
-The first and main command in this library is `report`. 
+Output:
 ```
-basel report --path tests/stubs/stub_project_a
-```
-You can look something like that
-```
-Component                                             I    A     D
--------------------------------------------------  ----  ---  ----
-tests/stubs/stub_project_a/__init__.py             1     1    1
-tests/stubs/stub_project_a/module_1.py             1     0    0
-tests/stubs/stub_project_a/package_b/module_b3.py  1     1    1
-tests/stubs/stub_project_a/package_b/module_b1.py  0.5   0    0.5
-tests/stubs/stub_project_a/package_b/__init__.py   1     1    1
-tests/stubs/stub_project_a/package_b/module_b2.py  1     0    0
-tests/stubs/stub_project_a/package_a/module_a2.py  0     0.5  0.5
-tests/stubs/stub_project_a/package_a/module_a1.py  0.25  1    0.25
-tests/stubs/stub_project_a/package_a/__init__.py   1     1    1
-Mean Distance: 0.58
-```
-This command prints a table with the components, the instability (I), the abstractions (A), and the distance (D) from this point (I, A) to the main sequence
-
-Check the `tests/stubs/stub_project_a/__init__.py` component, this has an abstraction and an instability of 1, which means that this component is unuseful. If you check in the project this is a Python package, and there is nothing in the ``__init__.py``. 
-
-Also, you can ignore some dependencies throughout the software evaluation.
-To do this use the `--ignore-dependencies` argument.
-
-```
-basel report --path tests/stubs/stub_project_a --ignore-dependencies="tests/stubs/stub_project_a/package_a/module_a1.py"
-```
-You can see something like that
-```
-Component                                            I    A    D
--------------------------------------------------  ---  ---  ---
-tests/stubs/stub_project_a/__init__.py               1  1    1
-tests/stubs/stub_project_a/module_1.py               1  0    0
-tests/stubs/stub_project_a/package_b/module_b3.py    1  1    1
-tests/stubs/stub_project_a/package_b/module_b1.py    0  0    1
-tests/stubs/stub_project_a/package_b/__init__.py     1  1    1
-tests/stubs/stub_project_a/package_b/module_b2.py    1  0    0
-tests/stubs/stub_project_a/package_a/module_a2.py    0  0.5  0.5
-tests/stubs/stub_project_a/package_a/module_a1.py    1  1    1
-tests/stubs/stub_project_a/package_a/__init__.py     1  1    1
-Mean Distance: 0.72
+Component                                   I     A     E
+----------------------------------------  ----  ----  ----
+path/to/project/module1                  0.75   0.2   0.05
+path/to/project/module2                     1   0.8   0.8
+path/to/project/module3                   0.5     1   0.5
+----------------------------------------  ----  ----  ----
+Mean                                     0.75  0.67  0.45
 ```
 
-We are ignoring the `tests/stubs/stub_project_a/package_a/module_a1.py` component.  If you note, in the above command output this module had an abstraction of 1 and instability of 0.25 and right now has 1 to both metrics. So, we are isolation this component from the rest of the architecture. This is useful when you can ignore the incoming dependencies of a specific module and evaluate the project stability with the rest of the components, e.x Evaluate the domain and infrastructure layers independently.
+### Component Relationship (CRel) Report
+This report uses a binary matrix, where 1 represents a relation, and 0 does not. All components are assigned to an index. Check the legend below the report to identify each component.
+
+```
+basel report --path ./path/to/project
+```
+Output:
+```
+  Components    1    2    3  
+------------  ---  ---  ---
+           1    0    1    0  
+           2    0    0    1  
+           3    0    0    0  
+
+Labels:
+1: path/to/project/module1
+2: path/to/project/module2
+3: path/to/project/module3
+```
+
+## Formatting
+To define a format use the `--format` or the abbreviation `-fmt`.
+
+| Format        | Reports  | Description               |
+|:------------- |:--------:|--------------------------:|
+| basic         | AE, CRel | Basic and default format  |
+| html          | AE, CRel | HTML format               |
+| mean_i        | AE       | Only Instability Mean     | 
+| mean_a        | AE       | Only Abstraction Mean     |
+| mean_e        | AE       | Only Error Mean           |
+| mean          | AE       | Only Error Mean           |
+| uml           | CRel     | UML code                  |
+| img           | CRel     | UML Component image       |
+
+
+## Excluding 
+You can exclude components in your project, which can be helpful to define boundaries. To exclude, you can use the `-e` or `--exclude` argument.
+
+
+## Filtering 
+Is posible that the report results are very long, to get your desired components you can use the `-f` or `--filter` arguments.
+
+
+## Contributing
+
+We welcome contributions! If you'd like to contribute to Basel, please follow these guidelines:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them with clear messages.
+4. Submit a pull request.
+
+Thank you for your contribution!
+
+## Contact
+
+If you have any questions or suggestions, feel free to insert new issue.
+
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
