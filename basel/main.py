@@ -15,7 +15,6 @@ COMMANDS = {
         "method": "report",
         "args": [
             ("path", "root_path"),
-            ("ignore_dependencies", "ignore_dependencies"),
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
@@ -26,7 +25,6 @@ COMMANDS = {
         "method": "component_relations",
         "args": [
             ("path", "root_path"),
-            ("ignore_dependencies", "ignore_dependencies"),
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
