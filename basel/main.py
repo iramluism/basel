@@ -77,11 +77,7 @@ def main():
 
     parser.add_argument("command", choices=["report", "rel"])
     parser.add_argument("-p", "--path", required=True, type=Path, nargs="+")
-    parser.add_argument(
-        "--ignore-dependencies",
-        type=cast_list_string,
-        help="Remove dependencies (modules, external libreries)",
-    )
+
     parser.add_argument(
         "-e",
         "--exclude",
