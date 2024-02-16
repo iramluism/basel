@@ -62,10 +62,15 @@ def setup_basel_client() -> Basel:
     return client
 
 
+HELPER_FOOTER_LOG = """
+FORMATS: basic|html|mean_i|mean_a|mean|uml
+"""
+
 def main():
     parser = argparse.ArgumentParser(
         prog=config.PROJECT_NAME,
         description="Calculate the abstraction and stability",
+        epilog=HELPER_FOOTER_LOG,
     )
 
     parser.add_argument("command", choices=["report", "rel"])
