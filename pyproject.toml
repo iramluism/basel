@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "basel"
-version = "1.1.1"
+version = "1.1.2"
 description = "Report Architecture Data"
 authors = ["Iram Luis Morales Santos <iramluism@gmail.com>", "Maura Elena Diaz Boente <mdboente@gmail.com>"]
 readme = "README.md"

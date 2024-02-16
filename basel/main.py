@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import sys
 
 from basel import config
 from basel import ReportFormat
@@ -15,7 +16,6 @@ COMMANDS = {
         "method": "report",
         "args": [
             ("path", "root_path"),
-            ("ignore_dependencies", "ignore_dependencies"),
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
@@ -26,7 +26,6 @@ COMMANDS = {
         "method": "component_relations",
         "args": [
             ("path", "root_path"),
-            ("ignore_dependencies", "ignore_dependencies"),
             ("exclude", "exclude_components"),
             ("no-packages", "exclude_packages"),
             ("filter", "filter_by_components"),
@@ -64,19 +63,21 @@ def setup_basel_client() -> Basel:
     return client
 
 
+HELPER_FOOTER_LOG = """
+FORMATS: basic|html|mean_i|mean_a|mean|uml
+"""
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog=config.PROJECT_NAME,
         description="Calculate the abstraction and stability",
+        epilog=HELPER_FOOTER_LOG,
     )
 
     parser.add_argument("command", choices=["report", "rel"])
     parser.add_argument("-p", "--path", required=True, type=Path, nargs="+")
-    parser.add_argument(
-        "--ignore-dependencies",
-        type=cast_list_string,
-        help="Remove dependencies (modules, external libreries)",
-    )
+
     parser.add_argument(
         "-e",
         "--exclude",
@@ -92,8 +93,16 @@ def main():
     )
 
     parser.add_argument(
-        "-fmt", "--format", help="Report Format", type=ReportFormat, default=None
+        "-fmt",
+        "--format",
+        help="Report Format, 'basic' by default",
+        type=ReportFormat,
+        default=None,
     )
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        return
 
     _args = parser.parse_args()
 
