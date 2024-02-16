@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import sys
 
 from basel import config
 from basel import ReportFormat
@@ -66,6 +67,7 @@ HELPER_FOOTER_LOG = """
 FORMATS: basic|html|mean_i|mean_a|mean|uml
 """
 
+
 def main():
     parser = argparse.ArgumentParser(
         prog=config.PROJECT_NAME,
@@ -95,8 +97,16 @@ def main():
     )
 
     parser.add_argument(
-        "-fmt", "--format", help="Report Format", type=ReportFormat, default=None
+        "-fmt",
+        "--format",
+        help="Report Format, 'basic' by default",
+        type=ReportFormat,
+        default=None,
     )
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        return
 
     _args = parser.parse_args()
 
