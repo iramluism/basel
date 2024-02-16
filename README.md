@@ -65,7 +65,6 @@ To define a format use the `--format` or the abbreviation `-fmt`.
 | mean_e        | AE       | Only Error Mean           |
 | mean          | AE       | Only Error Mean           |
 | uml           | CRel     | UML code                  |
-| img           | CRel     | UML Component image       |
 
 
 ## Excluding 
